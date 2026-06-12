@@ -1,0 +1,183 @@
+/* ============================================================
+   MUSLIM LIFE OS 2026 — Design System Tokens
+   ============================================================ */
+
+:root {
+  /* ── Core Palette ─────────────────────────────────────── */
+  --color-emerald:        #10B981;
+  --color-emerald-light:  #34D399;
+  --color-emerald-dark:   #059669;
+  --color-emerald-glow:   rgba(16, 185, 129, 0.35);
+
+  --color-navy:           #0F172A;
+  --color-navy-mid:       #1E293B;
+  --color-navy-light:     #334155;
+
+  --color-gold:           #F59E0B;
+  --color-gold-light:     #FCD34D;
+  --color-gold-dark:      #D97706;
+  --color-gold-glow:      rgba(245, 158, 11, 0.3);
+
+  --color-bg:             #020617;
+  --color-bg-2:           #050c1f;
+  --color-bg-3:           #0a1628;
+
+  /* ── Glass System ─────────────────────────────────────── */
+  --glass-bg:             rgba(255, 255, 255, 0.06);
+  --glass-bg-hover:       rgba(255, 255, 255, 0.10);
+  --glass-bg-strong:      rgba(255, 255, 255, 0.12);
+  --glass-border:         rgba(255, 255, 255, 0.10);
+  --glass-border-strong:  rgba(255, 255, 255, 0.18);
+  --glass-shadow:         0 8px 32px rgba(0, 0, 0, 0.5);
+  --glass-shadow-lg:      0 20px 60px rgba(0, 0, 0, 0.6);
+  --glass-blur:           blur(20px);
+  --glass-blur-sm:        blur(12px);
+
+  /* ── Emerald Glass ────────────────────────────────────── */
+  --glass-emerald:        rgba(16, 185, 129, 0.08);
+  --glass-emerald-border: rgba(16, 185, 129, 0.25);
+  --glass-gold:           rgba(245, 158, 11, 0.08);
+  --glass-gold-border:    rgba(245, 158, 11, 0.25);
+
+  /* ── Text ─────────────────────────────────────────────── */
+  --text-primary:         #F8FAFC;
+  --text-secondary:       #94A3B8;
+  --text-tertiary:        #64748B;
+  --text-emerald:         #10B981;
+  --text-gold:            #F59E0B;
+  --text-muted:           #475569;
+
+  /* ── Typography ───────────────────────────────────────── */
+  --font-sans:            'Inter', system-ui, sans-serif;
+  --font-arabic:          'Noto Sans Arabic', 'Arabic Typesetting', serif;
+  --font-display:         'Inter', system-ui, sans-serif;
+
+  --text-xs:              0.75rem;
+  --text-sm:              0.875rem;
+  --text-base:            1rem;
+  --text-lg:              1.125rem;
+  --text-xl:              1.25rem;
+  --text-2xl:             1.5rem;
+  --text-3xl:             1.875rem;
+  --text-4xl:             2.25rem;
+  --text-5xl:             3rem;
+
+  --font-light:           300;
+  --font-normal:          400;
+  --font-medium:          500;
+  --font-semibold:        600;
+  --font-bold:            700;
+  --font-extrabold:       800;
+
+  /* ── Spacing ──────────────────────────────────────────── */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ── Border Radius ────────────────────────────────────── */
+  --radius-sm:   0.5rem;
+  --radius-md:   0.75rem;
+  --radius-lg:   1rem;
+  --radius-xl:   1.5rem;
+  --radius-2xl:  2rem;
+  --radius-full: 9999px;
+
+  /* ── Gradients ────────────────────────────────────────── */
+  --grad-emerald:       linear-gradient(135deg, #10B981 0%, #059669 100%);
+  --grad-gold:          linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  --grad-hero:          linear-gradient(135deg, #020617 0%, #0a1628 40%, #020617 100%);
+  --grad-card:          linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
+  --grad-emerald-glow:  radial-gradient(ellipse at center, rgba(16,185,129,0.15) 0%, transparent 70%);
+  --grad-gold-glow:     radial-gradient(ellipse at center, rgba(245,158,11,0.12) 0%, transparent 70%);
+  --grad-dark-card:     linear-gradient(135deg, rgba(15,23,42,0.9) 0%, rgba(5,12,31,0.95) 100%);
+
+  /* ── Transitions ──────────────────────────────────────── */
+  --transition-fast:    150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base:    250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:    400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring:  500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Z-index ──────────────────────────────────────────── */
+  --z-base:    1;
+  --z-card:    10;
+  --z-nav:     100;
+  --z-modal:   200;
+  --z-tooltip: 300;
+  --z-top:     400;
+
+  /* ── Sidebar Width ────────────────────────────────────── */
+  --sidebar-width:         260px;
+  --sidebar-collapsed:     72px;
+  --topbar-height:         64px;
+  --bottom-nav-height:     76px;
+}
+
+/* ── Light Theme Overrides ──────────────────────────────── */
+[data-theme="light"] {
+  --color-bg:        #F0F4FF;
+  --color-bg-2:      #E8EFFE;
+  --color-bg-3:      #FFFFFF;
+  --glass-bg:        rgba(255, 255, 255, 0.7);
+  --glass-bg-hover:  rgba(255, 255, 255, 0.85);
+  --glass-border:    rgba(0, 0, 0, 0.08);
+  --text-primary:    #0F172A;
+  --text-secondary:  #334155;
+  --text-tertiary:   #64748B;
+  --text-muted:      #94A3B8;
+}
+
+/* ── OLED Black Theme ───────────────────────────────────── */
+[data-theme="oled"] {
+  --color-bg:   #000000;
+  --color-bg-2: #050505;
+  --color-bg-3: #0a0a0a;
+}
+
+/* ── Emerald Green Theme ────────────────────────────────── */
+[data-theme="emerald"] {
+  --color-bg:        #022c22;
+  --color-bg-2:      #042f2e;
+  --color-bg-3:      #064e3b;
+  --glass-bg:        rgba(4, 47, 46, 0.45);
+  --glass-border:    rgba(52, 211, 153, 0.2);
+  --text-primary:    #f0fdf4;
+  --text-secondary:  #a7f3d0;
+  --grad-hero:       linear-gradient(135deg, #022c22 0%, #064e3b 50%, #022c22 100%);
+}
+
+/* ── Royal Gold Theme ───────────────────────────────────── */
+[data-theme="gold"] {
+  --color-bg:        #1c1917;
+  --color-bg-2:      #292524;
+  --color-bg-3:      #0c0a09;
+  --color-emerald:   #f59e0b;
+  --text-emerald:    #f59e0b;
+  --glass-bg:        rgba(41, 37, 36, 0.5);
+  --glass-border:    rgba(245, 158, 11, 0.2);
+  --text-primary:    #fffbeb;
+  --text-secondary:  #fde68a;
+  --grad-hero:       linear-gradient(135deg, #1c1917 0%, #0c0a09 50%, #1c1917 100%);
+}
+
+/* ── Elegant Burgundy Theme ──────────────────────────────── */
+[data-theme="burgundy"] {
+  --color-bg:        #1e1b4b;
+  --color-bg-2:      #31102f;
+  --color-bg-3:      #581c87;
+  --color-emerald:   #ec4899;
+  --text-emerald:    #ec4899;
+  --glass-bg:        rgba(49, 16, 47, 0.5);
+  --glass-border:    rgba(236, 72, 153, 0.2);
+  --text-primary:    #fdf2f8;
+  --text-secondary:  #fbcfe8;
+  --grad-hero:       linear-gradient(135deg, #1e1b4b 0%, #31102f 50%, #1e1b4b 100%);
+}

@@ -1,0 +1,217 @@
+.qibla {
+  padding-bottom: 2rem;
+}
+.qibla__header {
+  margin-bottom: 1.5rem;
+}
+.qibla__title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.qibla__sub {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+.qibla__layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.qibla__card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.qibla__compass-container {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  margin: 2rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qibla__compass {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.4);
+  border: 2px solid var(--glass-border);
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s cubic-bezier(0.1, 0.8, 0.3, 1), border-color 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qibla__compass--aligned {
+  border-color: var(--color-emerald);
+  box-shadow: inset 0 0 30px rgba(16, 185, 129, 0.1), 0 0 20px rgba(16, 185, 129, 0.2);
+}
+.qibla__degree {
+  position: absolute;
+  font-weight: 800;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+.qibla__degree--n { top: 10px; color: var(--color-emerald); }
+.qibla__degree--e { right: 12px; }
+.qibla__degree--s { bottom: 10px; }
+.qibla__degree--w { left: 12px; }
+
+.qibla__tick {
+  position: absolute;
+  width: 1px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  top: 2px;
+}
+.qibla__kaaba-marker {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  top: 0;
+  left: 0;
+}
+.qibla__kaaba-pointer {
+  position: absolute;
+  top: -15px;
+  font-size: 2rem;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  animation: bounce-slow 2s infinite ease-in-out;
+}
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.qibla__needle {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+  z-index: 2;
+  transition: color 0.4s ease;
+  transform: rotate(45deg); /* Lucide navigation icon points NE, we rotate it to point N */
+}
+.qibla__arrow {
+  color: var(--color-emerald);
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
+}
+.qibla__needle--aligned .qibla__arrow {
+  animation: pulse-ring 1.5s infinite ease-in-out;
+  color: var(--color-gold);
+  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.8));
+}
+.qibla__glow {
+  position: absolute;
+  width: 290px;
+  height: 290px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0) 70%);
+  animation: pulse-ring 2s infinite;
+  z-index: 1;
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.02); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.qibla__info {
+  text-align: center;
+  width: 100%;
+  margin-top: 1rem;
+}
+.qibla__status {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: white;
+  transition: color 0.3s ease;
+  margin-bottom: 1rem;
+}
+.qibla__status--aligned {
+  color: var(--color-gold);
+}
+.qibla__meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  border-top: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 1rem 0;
+}
+.qibla__meta-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.qibla__meta-lbl {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.qibla__meta-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+  color: white;
+}
+
+.qibla__permission-btn {
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.qibla__simulation {
+  width: 100%;
+  margin-top: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+.qibla__sim-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+.qibla__sim-reset {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qibla__sim-reset:hover {
+  color: white;
+}
+.qibla__sim-slider {
+  width: 100%;
+  accent-color: var(--color-emerald);
+}
+
+.qibla__note {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: 1.5rem;
+  text-align: left;
+}

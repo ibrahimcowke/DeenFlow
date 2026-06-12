@@ -1,0 +1,213 @@
+/* ============================================================
+   MUSLIM LIFE OS 2026 — Global Styles
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Arabic:wght@300;400;500;600;700;800&display=swap');
+@import './tokens.css';
+@import './animations.css';
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  background: var(--color-bg);
+  color: var(--text-primary);
+  min-height: 100dvh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ── Form Inputs Defaults ─────────────────────────────────── */
+select option,
+select option:disabled {
+  background-color: var(--color-bg-3, #0f172a) !important;
+  color: var(--text-primary, #f8fafc) !important;
+}
+
+/* ── RTL Support ──────────────────────────────────────────── */
+[dir="rtl"] {
+  font-family: var(--font-arabic);
+  text-align: right;
+}
+[dir="rtl"] .sidebar { left: auto; right: 0; }
+[dir="rtl"] .main-content { margin-left: 0; margin-right: var(--sidebar-width); }
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+/* ── Selection ────────────────────────────────────────────── */
+::selection { background: var(--color-emerald-glow); color: var(--text-primary); }
+
+/* ── Focus Visible ────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-emerald);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Glass Card Utility ───────────────────────────────────── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+}
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--radius-xl);
+}
+.glass-emerald {
+  background: var(--glass-emerald);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-emerald-border);
+  border-radius: var(--radius-xl);
+}
+.glass-gold {
+  background: var(--glass-gold);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-gold-border);
+  border-radius: var(--radius-xl);
+}
+
+/* ── Clay Morphism ────────────────────────────────────────── */
+.clay {
+  background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+  border-radius: var(--radius-2xl);
+  box-shadow:
+    6px 6px 16px rgba(0,0,0,0.4),
+    -3px -3px 10px rgba(255,255,255,0.04),
+    inset 1px 1px 0px rgba(255,255,255,0.1);
+}
+
+/* ── Gradient Text ────────────────────────────────────────── */
+.text-gradient-emerald {
+  background: linear-gradient(135deg, var(--color-emerald-light) 0%, var(--color-emerald) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--color-gold-light) 0%, var(--color-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.text-gradient-hero {
+  background: linear-gradient(135deg, #FFFFFF 0%, var(--color-emerald-light) 50%, var(--color-gold-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Glow Effects ─────────────────────────────────────────── */
+.glow-emerald { box-shadow: 0 0 30px var(--color-emerald-glow), 0 0 60px rgba(16,185,129,0.15); }
+.glow-gold    { box-shadow: 0 0 30px var(--color-gold-glow), 0 0 60px rgba(245,158,11,0.1); }
+.glow-sm-emerald { box-shadow: 0 0 15px var(--color-emerald-glow); }
+
+/* ── Depth Layers ─────────────────────────────────────────── */
+.depth-1 { transform: translateZ(0px); }
+.depth-2 { transform: translateZ(8px); }
+.depth-3 { transform: translateZ(16px); }
+
+/* ── Islamic Pattern Overlay ──────────────────────────────── */
+.islamic-pattern-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='rgba(16,185,129,0.06)' stroke-width='0.5'/%3E%3Cpath d='M30 10 L50 30 L30 50 L10 30 Z' fill='none' stroke='rgba(245,158,11,0.04)' stroke-width='0.5'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* ── Noise Texture ────────────────────────────────────────── */
+.noise-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ── Utilities ────────────────────────────────────────────── */
+.flex         { display: flex; }
+.flex-col     { display: flex; flex-direction: column; }
+.flex-center  { display: flex; align-items: center; justify-content: center; }
+.gap-2  { gap: var(--space-2); }
+.gap-3  { gap: var(--space-3); }
+.gap-4  { gap: var(--space-4); }
+.gap-6  { gap: var(--space-6); }
+.gap-8  { gap: var(--space-8); }
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.relative { position: relative; }
+.absolute { position: absolute; }
+.overflow-hidden { overflow: hidden; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-bottom: calc(var(--bottom-nav-height) + 1rem);
+  }
+}
+
+/* ── Arabic Text ──────────────────────────────────────────── */
+.arabic-text {
+  font-family: var(--font-arabic);
+  direction: rtl;
+  text-align: right;
+  line-height: 2;
+  letter-spacing: 0;
+}
+.arabic-lg {
+  font-size: var(--text-2xl);
+  line-height: 2.5;
+}
+.arabic-xl {
+  font-size: var(--text-3xl);
+  line-height: 2.8;
+}
+
+/* ── Number / Score Display ───────────────────────────────── */
+.score-display {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  letter-spacing: -0.02em;
+}
+
+/* ── Page Container ───────────────────────────────────────── */
+.page-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-6);
+}
+@media (max-width: 768px) {
+  .page-container { padding: var(--space-4) var(--space-4); }
+}

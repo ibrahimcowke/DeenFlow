@@ -1,0 +1,152 @@
+.fasting {
+  padding-bottom: 2rem;
+}
+.fasting__title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+}
+.fasting__today {
+  margin-bottom: 1.5rem;
+}
+.fasting__today-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.fasting__today-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+.fasting__today-sub {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+.fasting__toggle {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+.fasting__toggle--on {
+  background: var(--color-emerald);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+.fasting__toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.fasting__toggle--on .fasting__toggle-thumb {
+  transform: translateX(22px);
+}
+.fasting__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.fasting__stat {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.fasting__stat-num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-emerald);
+}
+.fasting__stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+.fasting__section {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 1.5rem 0 1rem;
+  letter-spacing: -0.01em;
+}
+.fasting__sunnah-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+.fasting__sunnah {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.fasting__sunnah-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+.fasting__sunnah-info {
+  flex: 1;
+}
+.fasting__sunnah-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.fasting__sunnah-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.125rem;
+}
+.fasting__sunnah-next {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-emerald);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+.fasting__log-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+.fasting__log-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  transition: all 0.2s ease;
+}
+.fasting__log-day--fasted {
+  background: rgba(16, 185, 129, 0.2);
+  color: white;
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: inset 0 0 8px rgba(16, 185, 129, 0.2);
+}

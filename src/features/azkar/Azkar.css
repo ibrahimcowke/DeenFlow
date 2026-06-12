@@ -1,0 +1,551 @@
+.azkar-hub {
+  padding-bottom: 2rem;
+  width: 100%;
+  max-width: 100%;
+}
+.azkar-hub__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.azkar-hub__title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.azkar-hub__sub {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+.azkar-hub__nav {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE 10+ */
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 100%;
+}
+.azkar-hub__nav::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+.azkar-hub__nav-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.625rem 1.25rem;
+  border-radius: 12px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-base);
+  font-family: var(--font-sans);
+  flex-shrink: 0;
+}
+.azkar-hub__nav-btn:hover {
+  background: var(--glass-bg-hover);
+  color: white;
+}
+.azkar-hub__nav-btn--active {
+  background: var(--color-emerald);
+  color: white;
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+.azkar-hub__divider {
+  border: none;
+  border-top: 1px solid var(--glass-border);
+  margin: 1.25rem 0;
+}
+
+/* Daily Azkar Section */
+.azkar-hub__section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.azkar-hub__section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.azkar-hub__section-sub {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.125rem;
+}
+.azkar-hub__subcats {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE 10+ */
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 100%;
+}
+.azkar-hub__subcats::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+.azkar-hub__subcat-btn {
+  padding: 0.4rem 1rem;
+  border-radius: 99px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-family: var(--font-sans);
+  flex-shrink: 0;
+}
+.azkar-hub__subcat-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+.azkar-hub__subcat-btn--active {
+  background: var(--glass-gold);
+  border-color: var(--glass-gold-border);
+  color: var(--color-gold);
+}
+.azkar-hub__cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+}
+.azkar-hub__card {
+  position: relative;
+  transition: border-color 0.3s;
+  width: 100%;
+  max-width: 100%;
+}
+.azkar-hub__card--completed {
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  background: rgba(16, 185, 129, 0.04) !important;
+}
+.azkar-hub__card-num {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+}
+.azkar-hub__card-arabic {
+  font-family: var(--font-arabic);
+  font-size: 1.625rem;
+  direction: rtl;
+  text-align: right;
+  line-height: 2.2;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.azkar-hub__card-translit {
+  font-size: 0.8125rem;
+  color: var(--color-gold);
+  font-style: italic;
+  margin-bottom: 0.375rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.azkar-hub__card-trans {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.azkar-hub__progress-bg {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.azkar-hub__progress-fg {
+  height: 100%;
+  background: var(--grad-gold);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+.azkar-hub__card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.azkar-hub__card-status {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.azkar-hub__tap-btn {
+  background: var(--grad-gold);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+  transition: all 0.2s ease;
+}
+.azkar-hub__tap-btn:active {
+  transform: scale(0.95);
+}
+.azkar-hub__card-check {
+  font-size: 1.25rem;
+}
+
+/* Tasbih Counter Section */
+.azkar-hub__tasbih-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+@media (max-width: 768px) {
+  .azkar-hub__tasbih-layout {
+    grid-template-columns: 1fr;
+  }
+}
+.azkar-hub__tasbih-phrases {
+  display: flex;
+  flex-direction: column;
+}
+.azkar-hub__tasbih-subheading {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+.azkar-hub__phrases-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.azkar-hub__phrase-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: white;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.25s ease;
+  width: 100%;
+  white-space: normal;
+}
+.azkar-hub__phrase-btn:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.azkar-hub__phrase-btn--active {
+  background: rgba(16, 185, 129, 0.06);
+  border-color: var(--color-emerald);
+}
+.azkar-hub__phrase-ar {
+  font-family: var(--font-arabic);
+  font-size: 1.125rem;
+  align-self: flex-end;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.azkar-hub__phrase-trans {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.azkar-hub__tasbih-counter {
+  display: flex;
+  justify-content: center;
+}
+.azkar-hub__tasbih-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.azkar-hub__active-phrase {
+  margin-bottom: 1.5rem;
+  min-height: 80px;
+}
+.azkar-hub__active-arabic {
+  font-family: var(--font-arabic);
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+.azkar-hub__active-translit {
+  font-size: 0.8rem;
+  color: var(--color-emerald);
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+.azkar-hub__active-translation {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+.azkar-hub__ring-wrapper {
+  margin: 1.5rem 0;
+}
+.azkar-hub__tap-circle {
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 0.1s ease;
+}
+.azkar-hub__tap-circle:active {
+  transform: scale(0.96);
+}
+.azkar-hub__tap-inside {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.azkar-hub__tap-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+.azkar-hub__tap-count {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  margin: 0.25rem 0;
+}
+.azkar-hub__tap-target {
+  font-size: 0.7rem;
+  color: var(--color-emerald);
+  font-weight: 600;
+}
+.azkar-hub__tasbih-actions {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+.azkar-hub__targets {
+  display: flex;
+  gap: 0.5rem;
+}
+.azkar-hub__target-btn {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.azkar-hub__target-btn--active {
+  background: var(--color-emerald);
+  color: white;
+  border-color: var(--color-emerald);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+.azkar-hub__reset-btn {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Dua Center Section */
+.azkar-hub__dua-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1.5rem;
+}
+@media (max-width: 768px) {
+  .azkar-hub__dua-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+}
+.azkar-hub__search {
+  position: relative;
+  max-width: 300px;
+  width: 100%;
+}
+@media (max-width: 768px) {
+  .azkar-hub__search {
+    max-width: 100%;
+  }
+}
+.azkar-hub__search-icon {
+  position: absolute;
+  top: 50%;
+  left: 0.75rem;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+}
+.azkar-hub__search-input {
+  width: 100%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+  color: white;
+  font-size: 0.875rem;
+  outline: none;
+  font-family: var(--font-sans);
+}
+.azkar-hub__search-input:focus {
+  border-color: var(--color-emerald);
+}
+.azkar-hub__dua-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+.azkar-hub__dua-tag {
+  font-size: 0.7rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.azkar-hub__dua-fav {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.azkar-hub__dua-fav:hover {
+  color: var(--color-rose);
+}
+.azkar-hub__dua-fav--active {
+  color: var(--color-rose);
+}
+.azkar-hub__dua-arabic {
+  font-family: var(--font-arabic);
+  font-size: 1.35rem;
+  direction: rtl;
+  text-align: right;
+  line-height: 2.2;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.azkar-hub__dua-translation {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.azkar-hub__dua-source {
+  font-size: 0.7rem;
+  color: var(--color-gold);
+  font-weight: 500;
+  display: block;
+  text-align: right;
+}
+.azkar-hub__empty-duas {
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Custom Input Class to replace charity__input dependencies */
+.azkar-hub__input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  color: white;
+  font-size: 0.875rem;
+  outline: none;
+  font-family: var(--font-sans);
+  transition: all var(--transition-base);
+}
+.azkar-hub__input:focus {
+  border-color: var(--color-emerald);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Mobile Responsive Overrides ─────────────────────────── */
+@media (max-width: 480px) {
+  .azkar-hub__title {
+    font-size: 1.625rem;
+  }
+  .azkar-hub__card.glass-card--pad-lg,
+  .azkar-hub__tasbih-card.glass-card--pad-lg {
+    padding: var(--space-4) !important; /* 1rem instead of 2rem */
+  }
+  .azkar-hub__card-arabic {
+    font-size: 1.25rem;
+    line-height: 1.8;
+  }
+  .azkar-hub__card-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .azkar-hub__card-status {
+    text-align: center;
+    font-size: 0.75rem;
+  }
+  .azkar-hub__tap-btn {
+    width: 100%;
+    padding: 0.5rem 1rem;
+  }
+  .azkar-hub__card-check {
+    text-align: center;
+    font-size: 1.25rem;
+    margin-top: 0.25rem;
+  }
+  .azkar-hub__tasbih-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .azkar-hub__targets {
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+  }
+  .azkar-hub__target-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.4rem 0 !important;
+  }
+  .azkar-hub__reset-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}

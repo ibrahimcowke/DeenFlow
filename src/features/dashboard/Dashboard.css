@@ -1,0 +1,367 @@
+.dashboard {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Particles ───────────────────────────────────────────── */
+.dashboard__particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.dashboard__particle {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--color-emerald);
+  opacity: 0;
+  box-shadow: 0 0 6px var(--color-emerald);
+}
+
+/* ── Hero Header ─────────────────────────────────────────── */
+.dashboard__hero {
+  padding: var(--space-8) 0 var(--space-6);
+  position: relative;
+}
+.dashboard__hero-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+.dashboard__salaam {
+  font-family: var(--font-arabic);
+  font-size: var(--text-2xl);
+  color: var(--color-gold);
+  margin-bottom: var(--space-2);
+  direction: rtl;
+  text-shadow: 0 0 20px rgba(245,158,11,0.3);
+}
+.dashboard__greeting {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: var(--font-extrabold);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: var(--space-3);
+}
+.dashboard__dates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.dashboard__hijri {
+  font-size: var(--text-sm);
+  color: var(--color-gold);
+  font-weight: var(--font-medium);
+}
+.dashboard__gregorian {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* ── Prayer Widget ───────────────────────────────────────── */
+.dashboard__prayer-widget {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-emerald-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4) var(--space-5);
+  text-align: center;
+  min-width: 160px;
+  animation: pulse-emerald 3s ease-in-out infinite;
+}
+.dashboard__pw-label {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-1);
+}
+.dashboard__pw-name {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+.dashboard__pw-time {
+  font-size: var(--text-lg);
+  color: var(--color-emerald);
+  font-weight: var(--font-semibold);
+  margin: var(--space-1) 0;
+}
+.dashboard__pw-countdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* ── Deen Score Card ─────────────────────────────────────── */
+.dashboard__deen-card { margin-bottom: var(--space-4); }
+.dashboard__deen-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+.dashboard__deen-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  letter-spacing: -0.02em;
+}
+.dashboard__deen-sub { font-size: var(--text-sm); color: var(--text-secondary); margin-top: 2px; }
+.dashboard__deen-analytics {
+  display: flex; align-items: center; gap: var(--space-1);
+  background: none; border: none; color: var(--color-emerald);
+  font-size: var(--text-sm); cursor: pointer; font-weight: var(--font-medium);
+  font-family: var(--font-sans);
+}
+.dashboard__deen-body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  flex-wrap: wrap;
+}
+.dashboard__deen-ring-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+.dashboard__deen-ring-inner {
+  display: flex; align-items: baseline; gap: 2px;
+}
+.dashboard__deen-score {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-extrabold);
+  color: var(--color-emerald);
+  line-height: 1;
+}
+.dashboard__deen-pct { font-size: var(--text-lg); color: var(--color-emerald); }
+.dashboard__deen-ring-label { font-size: var(--text-xs); color: var(--text-secondary); }
+
+.dashboard__deen-breakdown { flex: 1; display: flex; flex-direction: column; gap: var(--space-3); min-width: 200px; }
+.dashboard__breakdown-item {}
+.dashboard__breakdown-top {
+  display: flex; justify-content: space-between;
+  margin-bottom: 4px;
+}
+.dashboard__breakdown-label { font-size: var(--text-sm); color: var(--text-secondary); }
+.dashboard__breakdown-val { font-size: var(--text-sm); font-weight: var(--font-bold); }
+.dashboard__breakdown-track {
+  height: 5px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.dashboard__breakdown-fill { height: 100%; border-radius: 99px; }
+
+/* ── Prayer Rings Card ───────────────────────────────────── */
+.dashboard__prayers-card { margin-bottom: var(--space-4); }
+.dashboard__section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+.dashboard__section-header h3 {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+}
+.dashboard__see-all, .dashboard__deen-analytics {
+  display: flex; align-items: center; gap: 4px;
+  background: none; border: none;
+  color: var(--color-emerald); font-size: var(--text-sm);
+  cursor: pointer; font-weight: var(--font-medium);
+  font-family: var(--font-sans);
+  padding: 0;
+}
+.dashboard__prayer-rings {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.dashboard__prayer-ring {
+  display: flex; flex-direction: column;
+  align-items: center; gap: var(--space-2);
+  background: none; border: none; cursor: pointer;
+  transition: transform var(--transition-spring);
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+}
+.dashboard__prayer-ring:hover { background: var(--glass-bg); }
+.dashboard__prayer-ring--done .dashboard__prayer-emoji { color: var(--color-emerald); }
+.dashboard__prayer-emoji { font-size: 18px; line-height: 1; }
+.dashboard__prayer-name {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+}
+.dashboard__prayer-time-sm { font-size: 10px; color: var(--text-muted); }
+
+/* ── Feature Cards Grid ──────────────────────────────────── */
+.dashboard__cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.dashboard__feature-card { cursor: pointer; }
+.dashboard__feature-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+.dashboard__feature-icon {
+  width: 44px; height: 44px;
+  border-radius: var(--radius-lg);
+  border: 1px solid;
+  display: flex; align-items: center; justify-content: center;
+}
+.dashboard__feature-streak {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 99px;
+  padding: 2px var(--space-3);
+}
+.dashboard__feature-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  margin-bottom: var(--space-1);
+}
+.dashboard__feature-sub { font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--space-3); }
+.dashboard__feature-bar {
+  height: 5px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+.dashboard__feature-fill { height: 100%; border-radius: 99px; }
+.dashboard__feature-last { font-size: var(--text-xs); color: var(--text-muted); margin-bottom: var(--space-3); }
+.dashboard__feature-btn {
+  display: flex; align-items: center; gap: var(--space-1);
+  background: none; border: none;
+  color: var(--color-emerald); font-size: var(--text-sm);
+  cursor: pointer; font-weight: var(--font-semibold);
+  font-family: var(--font-sans); padding: 0;
+}
+
+/* ── Azkar Rings ─────────────────────────────────────────── */
+.dashboard__azkar-rings { display: flex; gap: var(--space-3); margin-top: var(--space-3); }
+.dashboard__azkar-item { display: flex; flex-direction: column; align-items: center; }
+
+/* ── Recovery ─────────────────────────────────────────────── */
+.dashboard__recovery-badge {
+  font-size: var(--text-xs); color: #8B5CF6;
+  background: rgba(139,92,246,0.12);
+  border: 1px solid rgba(139,92,246,0.25);
+  border-radius: 99px; padding: 2px var(--space-3);
+}
+.dashboard__recovery-stats { display: flex; gap: var(--space-6); margin: var(--space-4) 0; }
+.dashboard__recovery-stat { display: flex; flex-direction: column; }
+.dashboard__recovery-num { font-size: var(--text-3xl); font-weight: var(--font-extrabold); color: #8B5CF6; letter-spacing: -0.03em; }
+.dashboard__recovery-lbl { font-size: var(--text-xs); color: var(--text-secondary); }
+.dashboard__emergency-btn {
+  width: 100%;
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #EF4444;
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all var(--transition-base);
+}
+.dashboard__emergency-btn:hover { background: rgba(239,68,68,0.2); }
+
+/* ── Quick Actions ───────────────────────────────────────── */
+.dashboard__quick-card { margin-bottom: var(--space-6); }
+.dashboard__quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+.dashboard__quick-btn {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: var(--space-2);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4) var(--space-2);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+.dashboard__quick-btn:hover {
+  background: var(--action-bg);
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.dashboard__quick-icon {
+  width: 48px; height: 48px;
+  border-radius: var(--radius-lg);
+  background: var(--action-bg);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform var(--transition-spring);
+}
+.dashboard__quick-btn:hover .dashboard__quick-icon { transform: scale(1.1) rotate(-3deg); }
+.dashboard__quick-label {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .dashboard__quick-grid { grid-template-columns: repeat(4, 1fr); gap: var(--space-2); }
+  .dashboard__quick-btn { padding: var(--space-3) var(--space-1); }
+  .dashboard__quick-icon { width: 40px; height: 40px; }
+  .dashboard__deen-body { justify-content: center; }
+  .dashboard__prayer-rings { justify-content: center; }
+}
+
+/* ── Daily Tip Banner ───────────────────────────────────── */
+.dashboard__tip-banner {
+  margin-bottom: var(--space-4);
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+  background: rgba(245, 158, 11, 0.03) !important;
+}
+.dashboard__tip-banner-body {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+.dashboard__tip-banner-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+.dashboard__tip-banner-info {
+  display: flex;
+  flex-direction: column;
+}
+.dashboard__tip-banner-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+.dashboard__tip-banner-desc {
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
