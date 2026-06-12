@@ -1,9 +1,9 @@
 {
-  "name": "muslim-life-os",
+  "name": "deenflow",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Muslim Life OS 2026 — Premium Islamic Productivity Ecosystem",
+  "description": "DeenFlow — Premium Islamic Productivity Ecosystem",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

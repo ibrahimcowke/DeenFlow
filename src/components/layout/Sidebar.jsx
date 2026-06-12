@@ -56,8 +56,8 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <span className="sidebar__logo-name">Muslim Life</span>
-              <span className="sidebar__logo-sub">OS 2026</span>
+              <span className="sidebar__logo-name">DeenFlow</span>
+              <span className="sidebar__logo-sub">Companion</span>
             </motion.div>
           )}
         </AnimatePresence>
