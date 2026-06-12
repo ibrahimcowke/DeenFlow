@@ -234,11 +234,50 @@ export default function QuranReader() {
     }
   };
 
-  const prev = () => setCurrentAyah(i => Math.max(0, i - 1));
+  const prev = () => {
+    if (currentAyah > 0) {
+      setCurrentAyah(i => i - 1);
+    } else {
+      // Go to previous Surah / Page / Juz
+      if (readType === 'surah' && readId > 1) {
+        navigate(`/quran/reader/${readId - 1}`);
+      } else if (readType === 'page' && readId > 1) {
+        navigate(`/quran/reader?type=page&id=${readId - 1}`);
+      } else if (readType === 'juz' && readId > 1) {
+        navigate(`/quran/reader?type=juz&id=${readId - 1}`);
+      }
+    }
+  };
+
   const next = () => {
     if (!surahData) return;
-    setCurrentAyah(i => Math.min(surahData.ayahs.length - 1, i + 1));
+    if (currentAyah < surahData.ayahs.length - 1) {
+      setCurrentAyah(i => i + 1);
+    } else {
+      // Go to next Surah / Page / Juz
+      if (readType === 'surah' && readId < 114) {
+        navigate(`/quran/reader/${readId + 1}`);
+      } else if (readType === 'page' && readId < 604) {
+        navigate(`/quran/reader?type=page&id=${readId + 1}`);
+      } else if (readType === 'juz' && readId < 30) {
+        navigate(`/quran/reader?type=juz&id=${readId + 1}`);
+      }
+    }
   };
+
+  // Scroll active ayah into view smoothly
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const activeEl = document.querySelector('.reader__ayah--active');
+      if (activeEl) {
+        activeEl.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [currentAyah, surahData]);
 
   if (loading) {
     return (
@@ -263,6 +302,16 @@ export default function QuranReader() {
       </div>
     );
   }
+
+  const isPrevDisabled = readId === 1 && currentAyah === 0;
+  
+  const isNextDisabled = !surahData || (
+    currentAyah === surahData.ayahs.length - 1 && (
+      (readType === 'surah' && readId === 114) ||
+      (readType === 'page' && readId === 604) ||
+      (readType === 'juz' && readId === 30)
+    )
+  );
 
   return (
     <div className={`reader reader--theme-${readerTheme}`}>
@@ -508,11 +557,11 @@ export default function QuranReader() {
         </div>
 
         <div className="reader__audio-right">
-          <button className="reader__nav-btn" onClick={prev} disabled={currentAyah === 0}>
+          <button className="reader__nav-btn" onClick={prev} disabled={isPrevDisabled}>
             <ChevronLeft size={16} /> Prev
           </button>
           <span className="reader__ayah-counter-badge">{currentAyah + 1}/{surahData.ayahs.length}</span>
-          <button className="reader__nav-btn" onClick={next} disabled={currentAyah === surahData.ayahs.length - 1}>
+          <button className="reader__nav-btn" onClick={next} disabled={isNextDisabled}>
             Next <ChevronRight size={16} />
           </button>
         </div>
