@@ -5,6 +5,8 @@ import {
   Settings as SettingsIcon, Eye, Bell, Shield, Info, LogOut, 
   ChevronRight, Volume2, Globe, Database, HelpCircle 
 } from 'lucide-react';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../services/firebase';
 import GlassCard from '../../components/ui/GlassCard';
 import Button from '../../components/ui/Button';
 import { useAppStore } from '../../store';
@@ -47,8 +49,13 @@ export default function Settings() {
     setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleSignOut = () => {
-    if (window.confirm('Are you sure you want to sign out?')) {
+  const handleSignOut = async () => {
+    if (window.confirm(t('confirm_logout', 'Are you sure you want to sign out?'))) {
+      try {
+        await signOut(auth);
+      } catch (err) {
+        console.error('Error signing out:', err);
+      }
       setUser(null);
       window.location.href = '/auth';
     }

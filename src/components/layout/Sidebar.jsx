@@ -3,9 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home, BookOpen, Moon, Heart, RefreshCw, StickyNote,
   Bot, User, Settings, ChevronLeft, ChevronRight,
-  Compass, Star, Coffee, Zap, Gift, Users,
+  Compass, Star, Coffee, Zap, Gift, Users, LogOut
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../services/firebase';
 import { useAppStore } from '../../store';
 import './Sidebar.css';
 
@@ -32,7 +34,19 @@ const BOTTOM_ITEMS = [
 
 export default function Sidebar({ mobileOpen, setMobileOpen }) {
   const { t } = useTranslation();
-  const { sidebarCollapsed, setSidebarCollapsed, userProfile } = useAppStore();
+  const { sidebarCollapsed, setSidebarCollapsed, userProfile, setUser } = useAppStore();
+
+  const handleSignOut = async () => {
+    if (window.confirm(t('confirm_logout', 'Are you sure you want to log out?'))) {
+      try {
+        await signOut(auth);
+      } catch (err) {
+        console.error('Error signing out:', err);
+      }
+      setUser(null);
+      window.location.href = '/auth';
+    }
+  };
 
   return (
     <motion.aside
@@ -121,6 +135,28 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
               onClick={() => setMobileOpen(false)}
             />
           ))}
+          
+          <button
+            onClick={handleSignOut}
+            className="sidebar__link sidebar__logout-link"
+            title={sidebarCollapsed ? t('nav_logout', 'Log Out') : ''}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              width: '100%', 
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              textAlign: 'left'
+            }}
+          >
+            <span className="sidebar__link-icon">
+              <LogOut size={20} />
+            </span>
+            {!sidebarCollapsed && (
+              <span className="sidebar__link-label">{t('nav_logout', 'Log Out')}</span>
+            )}
+          </button>
         </div>
       </nav>
 

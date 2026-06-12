@@ -194,6 +194,19 @@
   color: var(--color-emerald);
 }
 
+.sidebar__logout-link {
+  color: var(--color-rose, #ef4444) !important;
+  transition: all var(--transition-base);
+}
+.sidebar__logout-link:hover {
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #ff6b6b !important;
+}
+.sidebar__logout-link:hover .sidebar__link-icon {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #ff6b6b !important;
+}
+
 /* ── Mobile: Sidebar Drawer ──────────────────────────────── */
 @media (max-width: 768px) {
   .sidebar {
