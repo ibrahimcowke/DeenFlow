@@ -12,9 +12,12 @@ const firebaseConfig = {
   storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET     || 'deenflow-de743.appspot.com',
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '000000000000',
   appId:             import.meta.env.VITE_FIREBASE_APP_ID             || '1:000:web:000',
-  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID     || 'G-XXXXXXXXXX',
   databaseURL:       import.meta.env.VITE_FIREBASE_DATABASE_URL       || 'https://deenflow-de743-default-rtdb.firebaseio.com'
 };
+
+if (import.meta.env.VITE_FIREBASE_MEASUREMENT_ID && import.meta.env.VITE_FIREBASE_MEASUREMENT_ID !== 'G-XXXXXXXXXX') {
+  firebaseConfig.measurementId = import.meta.env.VITE_FIREBASE_MEASUREMENT_ID;
+}
 
 const app = initializeApp(firebaseConfig);
 
