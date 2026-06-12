@@ -1,6 +1,10 @@
+import { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../src/i18n/index.js';
+import { onAuthStateChanged } from 'firebase/auth';
+import { ref, get, set as rtdbSet } from 'firebase/database';
+import { auth, rtdb } from './services/firebase';
 import { useAppStore } from './store';
 import AppShell from './components/layout/AppShell';
 
@@ -10,8 +14,6 @@ import Auth from './features/auth/Auth';
 import Dashboard from './features/dashboard/Dashboard';
 
 // Lazy-loadable screens
-import { Suspense, lazy } from 'react';
-
 const Salah     = lazy(() => import('./features/salah/Salah'));
 const Quran     = lazy(() => import('./features/quran/Quran'));
 const QuranReader = lazy(() => import('./features/quran/QuranReader'));
@@ -53,8 +55,78 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+const partializeState = (s) => ({
+  onboardingComplete: s.onboardingComplete,
+  language: s.language,
+  dir: s.dir,
+  theme: s.theme,
+  dashboardLayout: s.dashboardLayout,
+  goals: s.goals,
+  todaySalah: s.todaySalah,
+  salahHistory: s.salahHistory,
+  qadaCounts: s.qadaCounts,
+  todaySunnah: s.todaySunnah,
+  quranProgress: s.quranProgress,
+  quranBookmarks: s.quranBookmarks,
+  azkarProgress: s.azkarProgress,
+  azkarStreak: s.azkarStreak,
+  habits: s.habits,
+  recovery: s.recovery,
+  notes: s.notes,
+  folders: s.folders,
+  donations: s.donations,
+  totalDonated: s.totalDonated,
+  userProfile: s.userProfile,
+  sidebarCollapsed: s.sidebarCollapsed,
+});
+
 export default function App() {
   const { onboardingComplete } = useAppStore();
+
+  // Firebase Realtime Database synchronization effect
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const dbRef = ref(rtdb, `users/${user.uid}/state`);
+        try {
+          const snapshot = await get(dbRef);
+          if (snapshot.exists()) {
+            const remoteState = snapshot.val();
+            // Hydrate the local Zustand store with remote data
+            useAppStore.setState(remoteState);
+          } else {
+            // First time login: sync current local storage state to cloud database
+            const localState = useAppStore.getState();
+            const stateToSave = partializeState(localState);
+            await rtdbSet(dbRef, stateToSave);
+          }
+        } catch (err) {
+          console.error('Error fetching state from Firebase RTDB:', err);
+        }
+
+        // Subscribe to state changes and push to cloud (debounced by 2 seconds)
+        let timeoutId = null;
+        const unsubscribeStore = useAppStore.subscribe((state) => {
+          if (timeoutId) clearTimeout(timeoutId);
+          timeoutId = setTimeout(async () => {
+            const stateToSave = partializeState(state);
+            try {
+              await rtdbSet(ref(rtdb, `users/${user.uid}/state`), stateToSave);
+            } catch (err) {
+              console.error('Error saving state to Firebase RTDB:', err);
+            }
+          }, 2000);
+        });
+
+        return () => {
+          unsubscribeStore();
+          if (timeoutId) clearTimeout(timeoutId);
+        };
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <BrowserRouter>
