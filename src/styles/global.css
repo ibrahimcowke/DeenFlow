@@ -11,6 +11,12 @@
   padding: 0;
 }
 
+input, button, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;

@@ -6,7 +6,7 @@
   z-index: var(--z-nav);
   padding: 0 var(--space-4) env(safe-area-inset-bottom, 8px);
   display: none;
-  background: rgba(2, 6, 23, 0.92);
+  background: var(--nav-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-top: 1px solid var(--glass-border);

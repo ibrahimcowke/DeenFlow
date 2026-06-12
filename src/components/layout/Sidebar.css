@@ -6,7 +6,7 @@
   z-index: var(--z-nav);
   display: flex;
   flex-direction: column;
-  background: rgba(5, 12, 31, 0.92);
+  background: var(--nav-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-right: 1px solid var(--glass-border);

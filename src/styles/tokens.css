@@ -119,6 +119,7 @@
   --sidebar-collapsed:     72px;
   --topbar-height:         64px;
   --bottom-nav-height:     76px;
+  --nav-bg:                rgba(5, 12, 31, 0.92);
 }
 
 /* ── Light Theme Overrides ──────────────────────────────── */
@@ -133,6 +134,7 @@
   --text-secondary:  #334155;
   --text-tertiary:   #64748B;
   --text-muted:      #94A3B8;
+  --nav-bg:          rgba(232, 239, 254, 0.92);
 }
 
 /* ── OLED Black Theme ───────────────────────────────────── */
@@ -140,6 +142,7 @@
   --color-bg:   #000000;
   --color-bg-2: #050505;
   --color-bg-3: #0a0a0a;
+  --nav-bg:     rgba(0, 0, 0, 0.92);
 }
 
 /* ── Emerald Green Theme ────────────────────────────────── */
@@ -152,6 +155,7 @@
   --text-primary:    #f0fdf4;
   --text-secondary:  #a7f3d0;
   --grad-hero:       linear-gradient(135deg, #022c22 0%, #064e3b 50%, #022c22 100%);
+  --nav-bg:          rgba(4, 47, 46, 0.92);
 }
 
 /* ── Royal Gold Theme ───────────────────────────────────── */
@@ -166,6 +170,7 @@
   --text-primary:    #fffbeb;
   --text-secondary:  #fde68a;
   --grad-hero:       linear-gradient(135deg, #1c1917 0%, #0c0a09 50%, #1c1917 100%);
+  --nav-bg:          rgba(12, 10, 9, 0.92);
 }
 
 /* ── Elegant Burgundy Theme ──────────────────────────────── */
@@ -180,4 +185,5 @@
   --text-primary:    #fdf2f8;
   --text-secondary:  #fbcfe8;
   --grad-hero:       linear-gradient(135deg, #1e1b4b 0%, #31102f 50%, #1e1b4b 100%);
+  --nav-bg:          rgba(49, 16, 47, 0.92);
 }
