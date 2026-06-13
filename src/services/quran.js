@@ -122,3 +122,32 @@ export const SURAH_ARABIC_NAMES = [
   'قريش', 'الماعون', 'الكوثر', 'الكافرون', 'النصر',
   'المسد', 'الإخلاص', 'الفلق', 'الناس'
 ];
+
+/**
+ * Get a Hizb
+ */
+export async function fetchHizb(hizbNumber) {
+  const [arabicRes, translationRes] = await Promise.all([
+    axios.get(`${BASE}/hizb/${hizbNumber}/ar.alafasy`),
+    axios.get(`${BASE}/hizb/${hizbNumber}/en.asad`),
+  ]);
+  return {
+    arabic: arabicRes.data.data,
+    translation: translationRes.data.data,
+  };
+}
+
+/**
+ * Get a Hizb Quarter (Maqrah)
+ */
+export async function fetchHizbQuarter(hizbQuarterNumber) {
+  const [arabicRes, translationRes] = await Promise.all([
+    axios.get(`${BASE}/hizbQuarter/${hizbQuarterNumber}/ar.alafasy`),
+    axios.get(`${BASE}/hizbQuarter/${hizbQuarterNumber}/en.asad`),
+  ]);
+  return {
+    arabic: arabicRes.data.data,
+    translation: translationRes.data.data,
+  };
+}
+

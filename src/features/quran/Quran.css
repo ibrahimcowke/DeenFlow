@@ -216,3 +216,23 @@
   margin-top: 1rem;
 }
 
+/* Selector Grid & Premium Hover Card Effects */
+.quran__dropdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.quran__selector-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+  transition: transform var(--transition-base), border-color var(--transition-base);
+}
+
+.quran__selector-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(16, 185, 129, 0.3);
+}

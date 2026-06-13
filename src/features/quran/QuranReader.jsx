@@ -6,7 +6,7 @@ import {
   Play, Pause, Volume2, BookOpen, HelpCircle, Layers, EyeOff, Eye,
   Maximize2, Minimize2
 } from 'lucide-react';
-import { fetchSurah, fetchPage, fetchJuz, SURAH_NAMES, SURAH_ARABIC_NAMES } from '../../services/quran';
+import { fetchSurah, fetchPage, fetchJuz, fetchHizb, fetchHizbQuarter, SURAH_NAMES, SURAH_ARABIC_NAMES } from '../../services/quran';
 import { useAppStore } from '../../store';
 import './QuranReader.css';
 
@@ -110,7 +110,7 @@ export default function QuranReader() {
 
   const isBookmarked = quranBookmarks.some(b => b.surah === activeSurahId && b.ayah === (surahData?.ayahs[currentAyah]?.number || 1));
 
-  // Fetch Surah/Juz/Page from API or load local offline fallback
+  // Fetch Surah/Juz/Page/Hizb/HizbQuarter from API or load local offline fallback
   useEffect(() => {
     let active = true;
     setLoading(true);
@@ -127,6 +127,14 @@ export default function QuranReader() {
           translationData = res.translation;
         } else if (readType === 'juz') {
           const res = await fetchJuz(readId);
+          arabicData = res.arabic;
+          translationData = res.translation;
+        } else if (readType === 'hizb') {
+          const res = await fetchHizb(readId);
+          arabicData = res.arabic;
+          translationData = res.translation;
+        } else if (readType === 'hizbQuarter') {
+          const res = await fetchHizbQuarter(readId);
           arabicData = res.arabic;
           translationData = res.translation;
         } else {
@@ -149,12 +157,25 @@ export default function QuranReader() {
         setSurahData({
           number: readId,
           type: readType,
-          name: readType === 'surah' ? arabicData.englishName : (readType === 'juz' ? `Juz ${readId}` : `Page ${readId}`),
-          arabicName: readType === 'surah' ? arabicData.name : (readType === 'juz' ? `الجزء ${readId}` : `الصفحة ${readId}`),
+          name: readType === 'surah' ? arabicData.englishName : (readType === 'juz' ? `Juz ${readId}` : (readType === 'hizb' ? `Hizb ${readId}` : (readType === 'hizbQuarter' ? `Maqrah ${readId}` : `Page ${readId}`))),
+          arabicName: readType === 'surah' ? arabicData.name : (readType === 'juz' ? `الجزء ${readId}` : (readType === 'hizb' ? `الحزب ${readId}` : (readType === 'hizbQuarter' ? `ربع الحزب ${readId}` : `الصفحة ${readId}`))),
           juz: arabicData.ayahs[0]?.juz || readId,
           page: arabicData.ayahs[0]?.page || readId,
           ayahs: mappedAyahs
         });
+
+        // Check for URL-specified ayah
+        let initialAyahIndex = 0;
+        const queryParams = new URLSearchParams(location.search);
+        const urlAyah = queryParams.get('ayah');
+        if (urlAyah) {
+          const targetAyah = parseInt(urlAyah);
+          const idx = mappedAyahs.findIndex(a => a.number === targetAyah);
+          if (idx !== -1) {
+            initialAyahIndex = idx;
+          }
+        }
+        setCurrentAyah(initialAyahIndex);
 
         // Update reading history in store
         setQuranProgress({
@@ -238,13 +259,17 @@ export default function QuranReader() {
     if (currentAyah > 0) {
       setCurrentAyah(i => i - 1);
     } else {
-      // Go to previous Surah / Page / Juz
+      // Go to previous Surah / Page / Juz / Hizb / HizbQuarter
       if (readType === 'surah' && readId > 1) {
         navigate(`/quran/reader/${readId - 1}`);
       } else if (readType === 'page' && readId > 1) {
         navigate(`/quran/reader?type=page&id=${readId - 1}`);
       } else if (readType === 'juz' && readId > 1) {
         navigate(`/quran/reader?type=juz&id=${readId - 1}`);
+      } else if (readType === 'hizb' && readId > 1) {
+        navigate(`/quran/reader?type=hizb&id=${readId - 1}`);
+      } else if (readType === 'hizbQuarter' && readId > 1) {
+        navigate(`/quran/reader?type=hizbQuarter&id=${readId - 1}`);
       }
     }
   };
@@ -254,13 +279,17 @@ export default function QuranReader() {
     if (currentAyah < surahData.ayahs.length - 1) {
       setCurrentAyah(i => i + 1);
     } else {
-      // Go to next Surah / Page / Juz
+      // Go to next Surah / Page / Juz / Hizb / HizbQuarter
       if (readType === 'surah' && readId < 114) {
         navigate(`/quran/reader/${readId + 1}`);
       } else if (readType === 'page' && readId < 604) {
         navigate(`/quran/reader?type=page&id=${readId + 1}`);
       } else if (readType === 'juz' && readId < 30) {
         navigate(`/quran/reader?type=juz&id=${readId + 1}`);
+      } else if (readType === 'hizb' && readId < 60) {
+        navigate(`/quran/reader?type=hizb&id=${readId + 1}`);
+      } else if (readType === 'hizbQuarter' && readId < 240) {
+        navigate(`/quran/reader?type=hizbQuarter&id=${readId + 1}`);
       }
     }
   };
@@ -309,7 +338,9 @@ export default function QuranReader() {
     currentAyah === surahData.ayahs.length - 1 && (
       (readType === 'surah' && readId === 114) ||
       (readType === 'page' && readId === 604) ||
-      (readType === 'juz' && readId === 30)
+      (readType === 'juz' && readId === 30) ||
+      (readType === 'hizb' && readId === 60) ||
+      (readType === 'hizbQuarter' && readId === 240)
     )
   );
 
@@ -321,48 +352,100 @@ export default function QuranReader() {
           <ArrowLeft size={20} />
         </button>
         <div className="reader__title-wrap">
-          {readType === 'surah' ? (
-            <select 
-              value={readId}
-              onChange={(e) => navigate(`/quran/reader/${e.target.value}`)}
-              className="reader__reciter-select"
-              style={{ fontSize: '1.125rem', fontWeight: 800, paddingRight: '1rem', borderBottom: '1px dashed var(--glass-border)' }}
-            >
-              {SURAH_NAMES.map((name, idx) => (
-                <option key={idx + 1} value={idx + 1}>
-                  {idx + 1}. {name} ({SURAH_ARABIC_NAMES[idx]})
-                </option>
-              ))}
-            </select>
-          ) : readType === 'juz' ? (
-            <select 
-              value={readId}
-              onChange={(e) => navigate(`/quran/reader?type=juz&id=${e.target.value}`)}
-              className="reader__reciter-select"
-              style={{ fontSize: '1.125rem', fontWeight: 800, paddingRight: '1rem', borderBottom: '1px dashed var(--glass-border)' }}
-            >
-              {Array.from({ length: 30 }, (_, i) => i + 1).map((juz) => (
-                <option key={juz} value={juz}>
-                  Juz {juz}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <select 
-              value={readId}
-              onChange={(e) => navigate(`/quran/reader?type=page&id=${e.target.value}`)}
-              className="reader__reciter-select"
-              style={{ fontSize: '1.125rem', fontWeight: 800, paddingRight: '1rem', borderBottom: '1px dashed var(--glass-border)' }}
-            >
-              {Array.from({ length: 604 }, (_, i) => i + 1).map((page) => (
-                <option key={page} value={page}>
-                  Page {page}
-                </option>
-              ))}
-            </select>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+            {readType === 'surah' ? (
+              <select 
+                value={readId}
+                onChange={(e) => navigate(`/quran/reader/${e.target.value}`)}
+                className="reader__reciter-select"
+                style={{ fontSize: '1.125rem', fontWeight: 800, paddingRight: '1rem', borderBottom: '1px dashed var(--glass-border)' }}
+              >
+                {SURAH_NAMES.map((name, idx) => (
+                  <option key={idx + 1} value={idx + 1}>
+                    {idx + 1}. {name} ({SURAH_ARABIC_NAMES[idx]})
+                  </option>
+                ))}
+              </select>
+            ) : readType === 'juz' ? (
+              <select 
+                value={readId}
+                onChange={(e) => navigate(`/quran/reader?type=juz&id=${e.target.value}`)}
+                className="reader__reciter-select"
+                style={{ fontSize: '1.125rem', fontWeight: 800, paddingRight: '1rem', borderBottom: '1px dashed var(--glass-border)' }}
+              >
+                {Array.from({ length: 30 }, (_, i) => i + 1).map((juz) => (
+                  <option key={juz} value={juz}>
+                    Juz {juz}
+                  </option>
+                ))}
+              </select>
+            ) : readType === 'hizb' ? (
+              <select 
+                value={readId}
+                onChange={(e) => navigate(`/quran/reader?type=hizb&id=${e.target.value}`)}
+                className="reader__reciter-select"
+                style={{ fontSize: '1.125rem', fontWeight: 800, paddingRight: '1rem', borderBottom: '1px dashed var(--glass-border)' }}
+              >
+                {Array.from({ length: 60 }, (_, i) => i + 1).map((hizb) => (
+                  <option key={hizb} value={hizb}>
+                    Hizb {hizb}
+                  </option>
+                ))}
+              </select>
+            ) : readType === 'hizbQuarter' ? (
+              <select 
+                value={readId}
+                onChange={(e) => navigate(`/quran/reader?type=hizbQuarter&id=${e.target.value}`)}
+                className="reader__reciter-select"
+                style={{ fontSize: '1.125rem', fontWeight: 800, paddingRight: '1rem', borderBottom: '1px dashed var(--glass-border)' }}
+              >
+                {Array.from({ length: 240 }, (_, i) => i + 1).map((quarter) => (
+                  <option key={quarter} value={quarter}>
+                    Maqrah {quarter}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <select 
+                value={readId}
+                onChange={(e) => navigate(`/quran/reader?type=page&id=${e.target.value}`)}
+                className="reader__reciter-select"
+                style={{ fontSize: '1.125rem', fontWeight: 800, paddingRight: '1rem', borderBottom: '1px dashed var(--glass-border)' }}
+              >
+                {Array.from({ length: 604 }, (_, i) => i + 1).map((page) => (
+                  <option key={page} value={page}>
+                    Page {page}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {/* Ayah selector dropdown inside active set */}
+            {surahData?.ayahs && (
+              <select 
+                value={currentAyah}
+                onChange={(e) => setCurrentAyah(parseInt(e.target.value))}
+                className="reader__reciter-select"
+                style={{ 
+                  fontSize: '1.05rem', 
+                  fontWeight: 700, 
+                  paddingRight: '1rem', 
+                  borderBottom: '1px dashed var(--glass-border)', 
+                  marginLeft: '0.75rem',
+                  color: 'var(--color-emerald)'
+                }}
+              >
+                {surahData.ayahs.map((a, idx) => (
+                  <option key={idx} value={idx}>
+                    {readType === 'surah' ? `Ayah ${a.number}` : `${a.surahName} - Ayah ${a.number}`}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
           <span className="reader__surah-meta">
-            {readType === 'surah' ? `Juz ${surahData.juz} · Page ${surahData.page}` : (readType === 'juz' ? `Page ${surahData.page}` : `Juz ${surahData.juz}`)}
+            {surahData ? `Juz ${surahData.juz} · Page ${surahData.page}` : ''}
           </span>
         </div>
         
