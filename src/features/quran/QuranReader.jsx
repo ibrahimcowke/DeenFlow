@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { fetchSurah, fetchPage, fetchJuz, fetchHizb, fetchHizbQuarter, SURAH_NAMES, SURAH_ARABIC_NAMES } from '../../services/quran';
 import { useAppStore } from '../../store';
+import Button from '../../components/ui/Button';
 import './QuranReader.css';
 
 // Local offline fallback data for Surahs 1, 18, and 67
@@ -62,7 +63,7 @@ export default function QuranReader() {
   const navigate = useNavigate();
   const { surah: surahParam } = useParams();
   const location = useLocation();
-  const { quranBookmarks, addQuranBookmark, removeQuranBookmark, setQuranProgress } = useAppStore();
+  const { quranBookmarks, addQuranBookmark, removeQuranBookmark, setQuranProgress, userProfile, setUserProfile } = useAppStore();
   
   // Parse search params for type & id (e.g. ?type=juz&id=2)
   const searchParams = new URLSearchParams(location.search);
@@ -77,6 +78,7 @@ export default function QuranReader() {
   const [error, setError] = useState(null);
   
   const [currentAyah, setCurrentAyah] = useState(0);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [fontSize, setFontSize] = useState(() => {
     return window.innerWidth < 768 ? 20 : 28;
   });
@@ -154,6 +156,18 @@ export default function QuranReader() {
           surahName: ayah.surah?.englishName || arabicData.englishName
         }));
 
+        const queryParams = new URLSearchParams(location.search);
+        const startAyahParam = queryParams.get('startAyah');
+        const endAyahParam = queryParams.get('endAyah');
+
+        // Restrict to selected range for Surah mode if specified
+        let slicedAyahs = mappedAyahs;
+        if (readType === 'surah' && startAyahParam) {
+          const start = parseInt(startAyahParam);
+          const end = endAyahParam ? parseInt(endAyahParam) : mappedAyahs.length;
+          slicedAyahs = mappedAyahs.filter(a => a.number >= start && a.number <= end);
+        }
+
         setSurahData({
           number: readId,
           type: readType,
@@ -161,27 +175,25 @@ export default function QuranReader() {
           arabicName: readType === 'surah' ? arabicData.name : (readType === 'juz' ? `الجزء ${readId}` : (readType === 'hizb' ? `الحزب ${readId}` : (readType === 'hizbQuarter' ? `ربع الحزب ${readId}` : `الصفحة ${readId}`))),
           juz: arabicData.ayahs[0]?.juz || readId,
           page: arabicData.ayahs[0]?.page || readId,
-          ayahs: mappedAyahs
+          ayahs: slicedAyahs
         });
 
         // Check for URL-specified ayah
         let initialAyahIndex = 0;
-        const queryParams = new URLSearchParams(location.search);
         const urlAyah = queryParams.get('ayah');
         if (urlAyah) {
           const targetAyah = parseInt(urlAyah);
-          const idx = mappedAyahs.findIndex(a => a.number === targetAyah);
+          const idx = slicedAyahs.findIndex(a => a.number === targetAyah);
           if (idx !== -1) {
             initialAyahIndex = idx;
           }
         }
         setCurrentAyah(initialAyahIndex);
 
-        // Update reading history in store
+        // Update reading history pointers in store immediately
         setQuranProgress({
           lastSurah: arabicData.ayahs[0]?.surah?.number || readId,
           lastPage: arabicData.ayahs[0]?.page || readId,
-          todayPages: Math.min(20, Math.ceil(mappedAyahs.length / 15))
         });
 
         setLoading(false);
@@ -239,6 +251,62 @@ export default function QuranReader() {
       audio.removeEventListener('timeupdate', handleTimeUpdate);
     };
   }, [audio]);
+
+  const claimRewardAndFinish = () => {
+    if (!surahData) return;
+
+    let xpGained = 0;
+    let pagesRead = 1;
+    
+    if (readType === 'surah') {
+      xpGained = surahData.ayahs.length * 1;
+      pagesRead = Math.max(1, Math.ceil(surahData.ayahs.length / 15));
+    } else if (readType === 'page') {
+      xpGained = 15;
+      pagesRead = 1;
+    } else if (readType === 'hizbQuarter') {
+      xpGained = 40;
+      pagesRead = 3;
+    } else if (readType === 'hizb') {
+      xpGained = 150;
+      pagesRead = 10;
+    } else if (readType === 'juz') {
+      xpGained = 300;
+      pagesRead = 20;
+    }
+
+    // Level up calculation
+    const currentLevel = userProfile.level || 1;
+    const nextLevelXp = currentLevel * 100;
+    let newXp = (userProfile.xp || 0) + xpGained;
+    let newLevel = currentLevel;
+    
+    if (newXp >= nextLevelXp) {
+      newXp = newXp - nextLevelXp;
+      newLevel += 1;
+    }
+
+    // Commit to store
+    setUserProfile({ xp: newXp, level: newLevel });
+
+    const progress = useAppStore.getState().quranProgress;
+    let newStreak = progress.streak || 0;
+    if (progress.todayPages === 0) {
+      newStreak += 1;
+    }
+
+    setQuranProgress({
+      lastSurah: activeSurahId,
+      lastAyah: surahData.ayahs[currentAyah]?.number || 1,
+      lastPage: surahData.page || 1,
+      todayPages: (progress.todayPages || 0) + pagesRead,
+      totalPages: (progress.totalPages || 0) + pagesRead,
+      streak: newStreak
+    });
+
+    setShowCompletionModal(false);
+    navigate('/quran');
+  };
 
   const toggleBookmark = () => {
     const activeAyahNum = surahData?.ayahs[currentAyah]?.number || 1;
@@ -638,17 +706,90 @@ export default function QuranReader() {
             </div>
           </div>
         </div>
-
         <div className="reader__audio-right">
           <button className="reader__nav-btn" onClick={prev} disabled={isPrevDisabled}>
             <ChevronLeft size={16} /> Prev
           </button>
           <span className="reader__ayah-counter-badge">{currentAyah + 1}/{surahData.ayahs.length}</span>
-          <button className="reader__nav-btn" onClick={next} disabled={isNextDisabled}>
-            Next <ChevronRight size={16} />
-          </button>
+          
+          {currentAyah === surahData.ayahs.length - 1 ? (
+            <button 
+              className="reader__nav-btn" 
+              onClick={() => setShowCompletionModal(true)}
+              style={{
+                background: 'var(--color-emerald)',
+                color: 'white',
+                fontWeight: 700,
+                border: 'none',
+                boxShadow: '0 0 12px rgba(16, 185, 129, 0.4)'
+              }}
+            >
+              Complete 🎉
+            </button>
+          ) : (
+            <button className="reader__nav-btn" onClick={next} disabled={isNextDisabled}>
+              Next <ChevronRight size={16} />
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Completion & Reward Modal Overlay */}
+      <AnimatePresence>
+        {showCompletionModal && (
+          <div className="reader__modal-overlay">
+            <motion.div 
+              className="reader__modal"
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.92, opacity: 0 }}
+            >
+              <div className="reader__modal-glow" />
+              <span className="reader__modal-emoji">🏆</span>
+              <h2 className="reader__modal-title">Reading Completed!</h2>
+              <p className="reader__modal-subtitle">Alhamdulillah, you have finished your selected portion.</p>
+
+              <div className="reader__modal-stats">
+                <div className="reader__modal-stat-row">
+                  <span className="reader__modal-stat-label">Mode:</span>
+                  <span className="reader__modal-stat-value" style={{ textTransform: 'capitalize' }}>
+                    {readType === 'hizbQuarter' ? 'Maqrah' : readType}
+                  </span>
+                </div>
+                <div className="reader__modal-stat-row">
+                  <span className="reader__modal-stat-label">Scope:</span>
+                  <span className="reader__modal-stat-value">
+                    {readType === 'surah' 
+                      ? `${surahData.name} (${surahData.ayahs.length} Ayahs)` 
+                      : `${surahData.name}`}
+                  </span>
+                </div>
+                <div className="reader__modal-stat-row" style={{ borderTop: '1px solid var(--glass-border)', paddingTop: '0.75rem', marginTop: '0.25rem' }}>
+                  <span className="reader__modal-stat-label">Spiritual Reward:</span>
+                  <span className="reader__modal-reward">
+                    🌟 +{
+                      readType === 'surah' ? surahData.ayahs.length * 1
+                      : readType === 'page' ? 15
+                      : readType === 'hizbQuarter' ? 40
+                      : readType === 'hizb' ? 150
+                      : 300
+                    } XP
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <Button variant="emerald" fullWidth onClick={claimRewardAndFinish}>
+                  Claim Reward & Finish
+                </Button>
+                <Button variant="ghost" fullWidth onClick={() => setShowCompletionModal(false)}>
+                  Go Back to Reading
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

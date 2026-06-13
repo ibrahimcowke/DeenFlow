@@ -100,8 +100,10 @@ export default function Quran() {
   const [tempGoalValue, setTempGoalValue] = useState(goals.quranGoalValue || 5);
 
   // Selector drop-down states
+  const [activeSelectorMode, setActiveSelectorMode] = useState('surah');
   const [selectedSurah, setSelectedSurah] = useState('');
   const [selectedAyah, setSelectedAyah] = useState('1');
+  const [selectedEndAyah, setSelectedEndAyah] = useState('1');
   const [selectedJuz, setSelectedJuz] = useState('');
   const [selectedHizb, setSelectedHizb] = useState('');
   const [selectedMaqrah, setSelectedMaqrah] = useState('');
@@ -209,212 +211,236 @@ export default function Quran() {
 
       {/* Selector Dropdowns (shown when search is empty) */}
       {!search ? (
-        <div className="quran__dropdown-grid">
-          {/* Surah & Ayah Dropdown */}
-          <GlassCard className="quran__selector-card" padding="md" hover={false}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '1.5rem' }}>📖</span>
-                <h4 style={{ fontWeight: 700, fontSize: '0.95rem' }}>Select Surah</h4>
-              </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>Jump straight to a Surah recitation</p>
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-                <select
-                  className="quran__form-select"
-                  style={{ flex: 2 }}
-                  value={selectedSurah}
-                  onChange={(e) => {
-                    setSelectedSurah(e.target.value);
-                    setSelectedAyah('1');
-                  }}
-                >
-                  <option value="" disabled>-- Choose Surah --</option>
-                  {SURAH_NAMES.map((name, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}. {name} ({SURAH_ARABIC_NAMES[i]})
-                    </option>
+        <div style={{ marginBottom: '2rem' }}>
+          <GlassCard className="quran__unified-selector-card" padding="lg" hover={false} glow>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              
+              {/* Selector Mode Tabs */}
+              <div>
+                <h4 style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span>🎯</span> Quick Selection Mode
+                </h4>
+                <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+                  {[
+                    { id: 'surah', label: 'Surah & Ayah', emoji: '📖' },
+                    { id: 'juz', label: 'Juz (Part)', emoji: '🕋' },
+                    { id: 'hizb', label: 'Hizb (Xizb)', emoji: '🌀' },
+                    { id: 'hizbQuarter', label: 'Maqrah (Quarter)', emoji: '💠' },
+                    { id: 'page', label: 'Page', emoji: '📜' }
+                  ].map(mode => (
+                    <button
+                      key={mode.id}
+                      type="button"
+                      onClick={() => setActiveSelectorMode(mode.id)}
+                      className={`quran__tab ${activeSelectorMode === mode.id ? 'quran__tab--active' : ''}`}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        border: activeSelectorMode === mode.id ? '1px solid var(--color-emerald)' : '1px solid var(--glass-border)',
+                        background: activeSelectorMode === mode.id ? 'rgba(16, 185, 129, 0.15)' : 'var(--glass-bg)'
+                      }}
+                    >
+                      <span>{mode.emoji}</span>
+                      <span>{mode.label}</span>
+                    </button>
                   ))}
-                </select>
+                </div>
+              </div>
 
-                {selectedSurah && (
-                  <select
-                    className="quran__form-select"
-                    style={{ flex: 1 }}
-                    value={selectedAyah}
-                    onChange={(e) => setSelectedAyah(e.target.value)}
-                  >
-                    {Array.from(
-                      { length: ALL_SURAH_META[parseInt(selectedSurah) - 1].ayahs },
-                      (_, idx) => idx + 1
-                    ).map((ayahNum) => (
-                      <option key={ayahNum} value={ayahNum}>
-                        Ayah {ayahNum}
-                      </option>
-                    ))}
-                  </select>
+              {/* Dynamic Inputs Container */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', borderRadius: '16px', padding: '1.25rem' }}>
+                {activeSelectorMode === 'surah' && (
+                  <div>
+                    <h5 style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Choose Surah & Ayah Range</h5>
+                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                      <div style={{ flex: '2 1 200px', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                        <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Surah</label>
+                        <select
+                          className="quran__form-select"
+                          value={selectedSurah}
+                          onChange={(e) => {
+                            setSelectedSurah(e.target.value);
+                            setSelectedAyah('1');
+                            setSelectedEndAyah('1');
+                          }}
+                        >
+                          <option value="" disabled>-- Choose Surah --</option>
+                          {SURAH_NAMES.map((name, i) => (
+                            <option key={i + 1} value={i + 1}>
+                              {i + 1}. {name} ({SURAH_ARABIC_NAMES[i]})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {selectedSurah && (
+                        <>
+                          <div style={{ flex: '1 1 100px', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                            <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Start Ayah</label>
+                            <select
+                              className="quran__form-select"
+                              value={selectedAyah}
+                              onChange={(e) => {
+                                setSelectedAyah(e.target.value);
+                                if (parseInt(selectedEndAyah) < parseInt(e.target.value)) {
+                                  setSelectedEndAyah(e.target.value);
+                                }
+                              }}
+                            >
+                              {Array.from(
+                                { length: ALL_SURAH_META[parseInt(selectedSurah) - 1].ayahs },
+                                (_, idx) => idx + 1
+                              ).map((ayahNum) => (
+                                <option key={ayahNum} value={ayahNum}>
+                                  Ayah {ayahNum}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div style={{ flex: '1 1 100px', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                            <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>End Ayah</label>
+                            <select
+                              className="quran__form-select"
+                              value={selectedEndAyah}
+                              onChange={(e) => setSelectedEndAyah(e.target.value)}
+                            >
+                              {Array.from(
+                                { length: ALL_SURAH_META[parseInt(selectedSurah) - 1].ayahs },
+                                (_, idx) => idx + 1
+                              )
+                                .filter(ayahNum => ayahNum >= parseInt(selectedAyah))
+                                .map((ayahNum) => (
+                                  <option key={ayahNum} value={ayahNum}>
+                                    Ayah {ayahNum}
+                                  </option>
+                                ))}
+                            </select>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {activeSelectorMode === 'juz' && (
+                  <div>
+                    <h5 style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Choose Juz (Part)</h5>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                      <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Juz Number (1 to 30)</label>
+                      <select
+                        className="quran__form-select"
+                        value={selectedJuz}
+                        onChange={(e) => setSelectedJuz(e.target.value)}
+                      >
+                        <option value="" disabled>-- Choose Juz --</option>
+                        {Array.from({ length: 30 }, (_, i) => i + 1).map((juz) => (
+                          <option key={juz} value={juz}>
+                            Juz {juz}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {activeSelectorMode === 'hizb' && (
+                  <div>
+                    <h5 style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Choose Xizb (Hizb)</h5>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                      <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Hizb Number (1 to 60)</label>
+                      <select
+                        className="quran__form-select"
+                        value={selectedHizb}
+                        onChange={(e) => setSelectedHizb(e.target.value)}
+                      >
+                        <option value="" disabled>-- Choose Xizb --</option>
+                        {Array.from({ length: 60 }, (_, i) => i + 1).map((hizb) => (
+                          <option key={hizb} value={hizb}>
+                            Hizb {hizb}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {activeSelectorMode === 'hizbQuarter' && (
+                  <div>
+                    <h5 style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Choose Maqrah (Hizb Quarter)</h5>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                      <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Quarter Number (1 to 240)</label>
+                      <select
+                        className="quran__form-select"
+                        value={selectedMaqrah}
+                        onChange={(e) => setSelectedMaqrah(e.target.value)}
+                      >
+                        <option value="" disabled>-- Choose Maqrah --</option>
+                        {Array.from({ length: 240 }, (_, i) => i + 1).map((quarter) => (
+                          <option key={quarter} value={quarter}>
+                            Maqrah {quarter} (Quarter)
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {activeSelectorMode === 'page' && (
+                  <div>
+                    <h5 style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Choose Page</h5>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                      <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Page Number (1 to 604)</label>
+                      <select
+                        className="quran__form-select"
+                        value={selectedPage}
+                        onChange={(e) => setSelectedPage(e.target.value)}
+                      >
+                        <option value="" disabled>-- Choose Page --</option>
+                        {Array.from({ length: 604 }, (_, i) => i + 1).map((page) => (
+                          <option key={page} value={page}>
+                            Page {page}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                 )}
               </div>
-            </div>
-            <Button 
-              variant="emerald" 
-              fullWidth 
-              disabled={!selectedSurah}
-              onClick={() => {
-                if (selectedSurah) {
-                  navigate(`/quran/reader/${selectedSurah}?ayah=${selectedAyah}`);
-                }
-              }}
-            >
-              Open Surah
-            </Button>
-          </GlassCard>
 
-          {/* Juz Dropdown */}
-          <GlassCard className="quran__selector-card" padding="md" hover={false}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '1.5rem' }}>🕋</span>
-                <h4 style={{ fontWeight: 700, fontSize: '0.95rem' }}>Select Juz (Part)</h4>
-              </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>Start reading from a specific Juz</p>
-              <div style={{ marginBottom: '1rem' }}>
-                <select
-                  className="quran__form-select"
-                  value={selectedJuz}
-                  onChange={(e) => setSelectedJuz(e.target.value)}
+              {/* Action Button */}
+              <div>
+                <Button
+                  variant="emerald"
+                  fullWidth
+                  icon={BookOpen}
+                  disabled={
+                    activeSelectorMode === 'surah' ? !selectedSurah
+                    : activeSelectorMode === 'juz' ? !selectedJuz
+                    : activeSelectorMode === 'hizb' ? !selectedHizb
+                    : activeSelectorMode === 'hizbQuarter' ? !selectedMaqrah
+                    : !selectedPage
+                  }
+                  onClick={() => {
+                    if (activeSelectorMode === 'surah') {
+                      navigate(`/quran/reader/${selectedSurah}?startAyah=${selectedAyah}&endAyah=${selectedEndAyah}`);
+                    } else if (activeSelectorMode === 'juz') {
+                      navigate(`/quran/reader?type=juz&id=${selectedJuz}`);
+                    } else if (activeSelectorMode === 'hizb') {
+                      navigate(`/quran/reader?type=hizb&id=${selectedHizb}`);
+                    } else if (activeSelectorMode === 'hizbQuarter') {
+                      navigate(`/quran/reader?type=hizbQuarter&id=${selectedMaqrah}`);
+                    } else {
+                      navigate(`/quran/reader?type=page&id=${selectedPage}`);
+                    }
+                  }}
                 >
-                  <option value="" disabled>-- Choose Juz --</option>
-                  {Array.from({ length: 30 }, (_, i) => i + 1).map((juz) => (
-                    <option key={juz} value={juz}>
-                      Juz {juz}
-                    </option>
-                  ))}
-                </select>
+                  Start Selected Reading
+                </Button>
               </div>
-            </div>
-            <Button 
-              variant="emerald" 
-              fullWidth 
-              disabled={!selectedJuz}
-              onClick={() => {
-                if (selectedJuz) {
-                  navigate(`/quran/reader?type=juz&id=${selectedJuz}`);
-                }
-              }}
-            >
-              Open Juz
-            </Button>
-          </GlassCard>
 
-          {/* Hizb Dropdown */}
-          <GlassCard className="quran__selector-card" padding="md" hover={false}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '1.5rem' }}>🌀</span>
-                <h4 style={{ fontWeight: 700, fontSize: '0.95rem' }}>Select Xizb (Hizb)</h4>
-              </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>Read a specific Hizb (1 to 60)</p>
-              <div style={{ marginBottom: '1rem' }}>
-                <select
-                  className="quran__form-select"
-                  value={selectedHizb}
-                  onChange={(e) => setSelectedHizb(e.target.value)}
-                >
-                  <option value="" disabled>-- Choose Xizb --</option>
-                  {Array.from({ length: 60 }, (_, i) => i + 1).map((hizb) => (
-                    <option key={hizb} value={hizb}>
-                      Hizb {hizb}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
-            <Button 
-              variant="emerald" 
-              fullWidth 
-              disabled={!selectedHizb}
-              onClick={() => {
-                if (selectedHizb) {
-                  navigate(`/quran/reader?type=hizb&id=${selectedHizb}`);
-                }
-              }}
-            >
-              Open Xizb
-            </Button>
-          </GlassCard>
-
-          {/* Maqrah Dropdown */}
-          <GlassCard className="quran__selector-card" padding="md" hover={false}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '1.5rem' }}>💠</span>
-                <h4 style={{ fontWeight: 700, fontSize: '0.95rem' }}>Select Maqrah</h4>
-              </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>Read a Rub el Hizb quarter (1 to 240)</p>
-              <div style={{ marginBottom: '1rem' }}>
-                <select
-                  className="quran__form-select"
-                  value={selectedMaqrah}
-                  onChange={(e) => setSelectedMaqrah(e.target.value)}
-                >
-                  <option value="" disabled>-- Choose Maqrah --</option>
-                  {Array.from({ length: 240 }, (_, i) => i + 1).map((quarter) => (
-                    <option key={quarter} value={quarter}>
-                      Maqrah {quarter}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <Button 
-              variant="emerald" 
-              fullWidth 
-              disabled={!selectedMaqrah}
-              onClick={() => {
-                if (selectedMaqrah) {
-                  navigate(`/quran/reader?type=hizbQuarter&id=${selectedMaqrah}`);
-                }
-              }}
-            >
-              Open Maqrah
-            </Button>
-          </GlassCard>
-
-          {/* Page Dropdown */}
-          <GlassCard className="quran__selector-card" padding="md" hover={false}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '1.5rem' }}>📜</span>
-                <h4 style={{ fontWeight: 700, fontSize: '0.95rem' }}>Select Page</h4>
-              </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>Navigate directly to a page (1-604)</p>
-              <div style={{ marginBottom: '1rem' }}>
-                <select
-                  className="quran__form-select"
-                  value={selectedPage}
-                  onChange={(e) => setSelectedPage(e.target.value)}
-                >
-                  <option value="" disabled>-- Choose Page --</option>
-                  {Array.from({ length: 604 }, (_, i) => i + 1).map((page) => (
-                    <option key={page} value={page}>
-                      Page {page}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <Button 
-              variant="emerald" 
-              fullWidth 
-              disabled={!selectedPage}
-              onClick={() => {
-                if (selectedPage) {
-                  navigate(`/quran/reader?type=page&id=${selectedPage}`);
-                }
-              }}
-            >
-              Open Page
-            </Button>
           </GlassCard>
         </div>
       ) : (
