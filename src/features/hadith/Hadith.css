@@ -1,1 +1,148 @@
 .hadith{padding-bottom:2rem}.hadith__title{font-size:2rem;font-weight:800;letter-spacing:-.03em;margin-bottom:1.5rem}.hadith__daily{margin-bottom:1.5rem}.hadith__daily-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--color-gold);margin-bottom:1rem}.hadith__arabic{font-family:var(--font-arabic);font-size:1.25rem;direction:rtl;text-align:right;line-height:2.2;color:var(--text-primary);margin-bottom:.75rem}.hadith__translation{font-size:.9375rem;color:var(--text-secondary);line-height:1.7;margin-bottom:.75rem}.hadith__meta{display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:var(--text-muted)}.hadith__source{color:var(--color-emerald);font-weight:600}.hadith__section-title{font-size:1.125rem;font-weight:700;margin-bottom:1rem}.hadith__list{display:flex;flex-direction:column;gap:.75rem}.hadith__item{}.hadith__item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}.hadith__cat{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--color-emerald);background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);border-radius:99px;padding:2px 8px}.hadith__fav{background:none;border:none;color:var(--text-muted);cursor:pointer;transition:color var(--transition-base)}.hadith__fav--active{color:var(--color-gold)}
+
+/* Hadith Tabs */
+.hadith__tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: var(--space-2);
+}
+
+.hadith__tab-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all var(--transition-base);
+}
+
+.hadith__tab-btn:hover {
+  background: var(--glass-bg);
+  color: var(--text-primary);
+}
+
+.hadith__tab-btn--active {
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: var(--color-emerald) !important;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* Quiz Arena Styling */
+.quiz__container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.quiz__progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+
+.quiz__progress-fill {
+  height: 100%;
+  background: var(--grad-emerald);
+  transition: width 0.3s ease-out;
+}
+
+.quiz__question-box {
+  background: rgba(255,255,255,0.01);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+}
+
+.quiz__question-text {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: var(--space-6);
+  line-height: 1.5;
+}
+
+.quiz__options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.quiz__option-btn {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.quiz__option-btn:hover:not(:disabled) {
+  background: var(--glass-bg-hover);
+  border-color: rgba(255,255,255,0.25);
+  transform: translateX(4px);
+}
+
+.quiz__option-btn--correct {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: var(--color-emerald) !important;
+  color: var(--color-emerald) !important;
+}
+
+.quiz__option-btn--incorrect {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: #EF4444 !important;
+  color: #EF4444 !important;
+}
+
+.quiz__explanation-box {
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  margin-top: var(--space-4);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.quiz__results-box {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+}
+
+.quiz__results-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: var(--space-2);
+}
+
+.quiz__results-score {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--color-gold);
+  margin: var(--space-4) 0;
+}
+
+.quiz__results-xp {
+  font-size: var(--text-sm);
+  color: var(--color-emerald);
+  font-weight: 700;
+  margin-bottom: var(--space-6);
+  background: rgba(16, 185, 129, 0.08);
+  padding: 0.35rem 0.75rem;
+  border-radius: 99px;
+  display: inline-block;
+}

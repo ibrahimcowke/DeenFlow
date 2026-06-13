@@ -42,3 +42,59 @@
   display: flex; align-items: center; gap: 4px;
   margin-top: 0.5rem; font-size: 0.65rem; color: var(--text-muted);
 }
+
+/* Adhan & Settings Styles */
+.salah__adhan-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.salah__adhan-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.salah__voice-select {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.salah__voice-btn {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.salah__voice-btn.active {
+  background: var(--color-gold);
+  border-color: var(--color-gold);
+  color: #000;
+}
+
+.salah__toggle-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: white;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.salah__toggle-pill.active {
+  background: var(--color-emerald);
+  border-color: var(--color-emerald);
+}

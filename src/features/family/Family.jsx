@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Award, Target, Zap, Share2, Plus, CheckCircle2 } from 'lucide-react';
+import { Users, Award, Target, Zap, Share2, Plus, CheckCircle2, Heart, MessageSquare } from 'lucide-react';
 import GlassCard from '../../components/ui/GlassCard';
 import Button from '../../components/ui/Button';
 import RingProgress from '../../components/ui/RingProgress';
@@ -19,6 +19,12 @@ const SHARED_CHALLENGES = [
   { id: 2, title: 'Fajr in Congregation', desc: 'Pray Fajr together at home or mosque for 7 consecutive days.', progress: 85, target: '7 Days', current: '6 Days', icon: '🕌' },
 ];
 
+const MOCK_ACTIVITIES = [
+  { id: 1, name: 'Layla', avatar: '👧', action: 'completed Quran Reading Goal', detail: '10 pages read today', xp: 50, time: '10m ago', likes: 4, liked: false },
+  { id: 2, name: 'Amina', avatar: '👩', action: 'completed Fajr in Congregation', detail: 'at Mosque', xp: 20, time: '2h ago', likes: 3, liked: false },
+  { id: 3, name: 'Yusuf', avatar: '👦', action: 'reached 3-day Salah streak', detail: '5/5 prayers on time', xp: 30, time: '4h ago', likes: 2, liked: false },
+];
+
 export default function Family() {
   const { userProfile } = useAppStore();
   const [members, setMembers] = useState(INITIAL_MEMBERS);
@@ -27,12 +33,43 @@ export default function Family() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [invitedList, setInvitedList] = useState([]);
 
+  // Challenge creator form states
+  const [showAddChallenge, setShowAddChallenge] = useState(false);
+  const [challengeTitle, setChallengeTitle] = useState('');
+  const [challengeDesc, setChallengeDesc] = useState('');
+  const [challengeTarget, setChallengeTarget] = useState('30 Juz');
+  const [challengeIcon, setChallengeIcon] = useState('📖');
+
+  // Activities Feed
+  const [activities, setActivities] = useState(MOCK_ACTIVITIES);
+
   const handleInvite = (e) => {
     e.preventDefault();
     if (!inviteEmail) return;
     setInvitedList([...invitedList, inviteEmail]);
     setInviteEmail('');
-    // Alert or small micro-feedback could be shown here
+  };
+
+  const handleLikeActivity = (id) => {
+    setActivities(prev => prev.map(act => act.id === id ? { ...act, likes: act.liked ? act.likes - 1 : act.likes + 1, liked: !act.liked } : act));
+  };
+
+  const handleAddChallengeSubmit = (e) => {
+    e.preventDefault();
+    if (!challengeTitle || !challengeDesc) return;
+    const newChallenge = {
+      id: Date.now(),
+      title: challengeTitle,
+      desc: challengeDesc,
+      progress: 0,
+      target: challengeTarget,
+      current: '0',
+      icon: challengeIcon
+    };
+    setChallenges([...challenges, newChallenge]);
+    setChallengeTitle('');
+    setChallengeDesc('');
+    setShowAddChallenge(false);
   };
 
   // Sort members by deenScore descending for the leaderboard
@@ -71,7 +108,7 @@ export default function Family() {
             <div className="family__summary-info">
               <span className="family__summary-label">Active Challenges</span>
               <h2 className="family__summary-val">{challenges.length}</h2>
-              <p className="family__summary-desc">Both goals on track to complete</p>
+              <p className="family__summary-desc">Goals on track to complete</p>
             </div>
             <div className="family__summary-icon-holder">
               <Target size={32} color="var(--color-gold)" />
@@ -81,7 +118,7 @@ export default function Family() {
       </div>
 
       <div className="family__grid">
-        {/* Members List */}
+        {/* Left column: Members & Activity Feed */}
         <div className="family__col">
           <h3 className="family__section-title">
             <Users size={18} className="family__section-icon" />
@@ -110,9 +147,41 @@ export default function Family() {
               </GlassCard>
             ))}
           </div>
+
+          {/* Activity Feed */}
+          <h3 className="family__section-title" style={{ marginTop: '2rem' }}>
+            <MessageSquare size={18} className="family__section-icon" />
+            Family Activity Feed
+          </h3>
+          <div className="family__activity-list">
+            {activities.map((act) => (
+              <div key={act.id} className="family__activity-card">
+                <div className="family__activity-left">
+                  <span className="family__activity-avatar">{act.avatar}</span>
+                  <div className="family__activity-text">
+                    <span className="family__activity-name">{act.name}</span>{' '}
+                    <span>{act.action}</span>
+                    <p className="family__activity-detail">
+                      {act.detail} <span className="family__activity-xp">+{act.xp} XP</span>
+                    </p>
+                  </div>
+                </div>
+                <div className="family__activity-right">
+                  <span className="family__activity-time">{act.time}</span>
+                  <button 
+                    className={`family__activity-like-btn ${act.liked ? 'liked' : ''}`}
+                    onClick={() => handleLikeActivity(act.id)}
+                  >
+                    <Heart size={12} fill={act.liked ? 'currentColor' : 'none'} />
+                    <span>{act.likes}</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Leaderboard & Challenges */}
+        {/* Right column: Leaderboard & Challenges */}
         <div className="family__col">
           <h3 className="family__section-title">
             <Award size={18} className="family__section-icon" />
@@ -139,10 +208,70 @@ export default function Family() {
             </div>
           </GlassCard>
 
-          <h3 className="family__section-title" style={{ marginTop: '2rem' }}>
-            <Target size={18} className="family__section-icon" />
-            Shared Challenges
-          </h3>
+          {/* Group Challenges list and creation */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem', marginBottom: '1rem' }}>
+            <h3 className="family__section-title" style={{ margin: 0 }}>
+              <Target size={18} className="family__section-icon" />
+              Shared Challenges
+            </h3>
+            <button 
+              onClick={() => setShowAddChallenge(!showAddChallenge)}
+              style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.25)', color: 'var(--color-emerald)', padding: '0.3rem 0.65rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}
+            >
+              {showAddChallenge ? 'Cancel' : '+ New Challenge'}
+            </button>
+          </div>
+
+          <AnimatePresence>
+            {showAddChallenge && (
+              <motion.form 
+                onSubmit={handleAddChallengeSubmit}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="family__challenge-form"
+              >
+                <div className="family__challenge-form-group">
+                  <label className="family__challenge-form-label">Title</label>
+                  <input 
+                    type="text" placeholder="Challenge title..." required
+                    value={challengeTitle} onChange={e => setChallengeTitle(e.target.value)}
+                    className="family__challenge-form-input"
+                  />
+                </div>
+                <div className="family__challenge-form-group">
+                  <label className="family__challenge-form-label">Description</label>
+                  <input 
+                    type="text" placeholder="Enter target guidelines..." required
+                    value={challengeDesc} onChange={e => setChallengeDesc(e.target.value)}
+                    className="family__challenge-form-input"
+                  />
+                </div>
+                <div className="family__challenge-form-group">
+                  <label className="family__challenge-form-label">Category Icon</label>
+                  <select 
+                    value={challengeIcon} onChange={e => setChallengeIcon(e.target.value)}
+                    className="family__challenge-form-input"
+                  >
+                    <option value="📖">📖 Quran</option>
+                    <option value="🕌">🕌 Salah</option>
+                    <option value="🍉">🍉 Fasting</option>
+                    <option value="💚">💚 Charity</option>
+                  </select>
+                </div>
+                <div className="family__challenge-form-group">
+                  <label className="family__challenge-form-label">Target Goal</label>
+                  <input 
+                    type="text" placeholder="e.g. 30 Juz, 30 days" required
+                    value={challengeTarget} onChange={e => setChallengeTarget(e.target.value)}
+                    className="family__challenge-form-input"
+                  />
+                </div>
+                <Button variant="emerald" type="submit" style={{ padding: '0.4rem 1rem', width: '100%', marginTop: '0.5rem' }}>Create Challenge</Button>
+              </motion.form>
+            )}
+          </AnimatePresence>
+
           <div className="family__challenges-list">
             {challenges.map((c, idx) => (
               <GlassCard key={c.id} className="family__challenge-card" padding="md" delay={0.25 + idx * 0.05}>

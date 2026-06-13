@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { MapPin, BarChart2, Check, Plus, Minus } from 'lucide-react';
+import { MapPin, BarChart2, Check, Plus, Minus, Volume2, VolumeX, Radio } from 'lucide-react';
 import GlassCard from '../../components/ui/GlassCard';
 import RingProgress from '../../components/ui/RingProgress';
 import { useAppStore } from '../../store';
+import { usePrayerTimes } from '../../hooks';
 import { formatPrayerTime } from '../../services/prayerTimes';
 import './Salah.css';
 
@@ -38,15 +39,97 @@ const generateHeatmap = () => {
 
 export default function Salah() {
   const { 
-    todaySalah, toggleSalah, setSalahAtMosque, prayerTimes,
+    todaySalah, toggleSalah, setSalahAtMosque,
     qadaCounts, incrementQada, decrementQada,
     todaySunnah, toggleSunnah 
   } = useAppStore();
+
+  const { prayerTimes, nextPrayer, countdown } = usePrayerTimes();
 
   const [heatmap] = useState(generateHeatmap);
 
   const completedCount = Object.values(todaySalah).filter(p => p.completed).length;
   const completionPct = Math.round((completedCount / 5) * 100);
+
+  // Adhan Settings state
+  const [adhanVoice, setAdhanVoice] = useState('makkah');
+  const [adhanEnabled, setAdhanEnabled] = useState(true);
+  const [playingAdhan, setPlayingAdhan] = useState(false);
+  const [audioInstance, setAudioInstance] = useState(null);
+
+  const playTactileClick = () => {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = new AudioContextClass();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(1000, ctx.currentTime);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.05);
+    } catch (e) {}
+  };
+
+  const playSynthChime = () => {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = new AudioContextClass();
+      const playTone = (freq, start, duration) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+        gain.gain.setValueAtTime(0.06, ctx.currentTime + start);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + duration);
+        osc.start(ctx.currentTime + start);
+        osc.stop(ctx.currentTime + start + duration);
+      };
+      playTone(329.63, 0, 1.2);
+      playTone(392.00, 0.3, 1.2);
+      playTone(523.25, 0.6, 1.6);
+    } catch (e) {}
+  };
+
+  const playAdhanPreview = () => {
+    if (playingAdhan) {
+      if (audioInstance) {
+        audioInstance.pause();
+        audioInstance.currentTime = 0;
+      }
+      setPlayingAdhan(false);
+      return;
+    }
+
+    playTactileClick();
+
+    const adhanUrls = {
+      makkah: 'https://www.islamcan.com/adhan/audio/adhan-makkah.mp3',
+      madinah: 'https://www.islamcan.com/adhan/audio/adhan-madinah.mp3',
+      bosnia: 'https://www.islamcan.com/adhan/audio/adhan-bosnia.mp3'
+    };
+
+    const audio = new Audio(adhanUrls[adhanVoice]);
+    audio.volume = 0.4;
+    audio.play()
+      .then(() => {
+        setAudioInstance(audio);
+        setPlayingAdhan(true);
+        audio.onended = () => setPlayingAdhan(false);
+      })
+      .catch((e) => {
+        console.error("Adhan audio play failed, falling back to synth chime", e);
+        playSynthChime();
+        setPlayingAdhan(true);
+        setTimeout(() => setPlayingAdhan(false), 3000);
+      });
+  };
 
   return (
     <div className="salah page-container">
@@ -106,6 +189,79 @@ export default function Salah() {
           );
         })}
       </div>
+
+      {/* Dynamic Prayer Countdown Ring */}
+      {nextPrayer && (
+        <GlassCard className="salah__countdown-card" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem' }}>
+          <div>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>Next Prayer</span>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, margin: '0.15rem 0', color: 'white', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <span>🕌</span> {nextPrayer.name}
+            </h2>
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-gold)', fontWeight: 600 }}>at {nextPrayer.time ? formatPrayerTime(nextPrayer.time) : '--:--'}</p>
+          </div>
+          
+          <RingProgress value={Math.max(0, Math.min(100, (nextPrayer.minsLeft / 360) * 100))} size={90} stroke={8} color="var(--color-gold)" glow animated>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.875rem', fontWeight: 900, color: 'white' }}>{countdown}</span>
+              <span style={{ fontSize: '0.55rem', color: 'var(--text-muted)' }}>remaining</span>
+            </div>
+          </RingProgress>
+        </GlassCard>
+      )}
+
+      {/* Adhan & Settings Card */}
+      <GlassCard className="salah__adhan-card" style={{ marginBottom: '1.5rem', padding: '1.25rem 1.5rem' }}>
+        <h3 style={{ fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span>🔊</span> Adhan Voice Library
+        </h3>
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+          Configure audio notifications for prayer times and test premium muezzin voices.
+        </p>
+
+        <div className="salah__adhan-grid">
+          <div className="salah__adhan-row">
+            <span style={{ fontSize: '0.875rem', color: 'white', fontWeight: 600 }}>Adhan Voice</span>
+            <div className="salah__voice-select">
+              {[
+                { id: 'makkah', label: 'Makkah' },
+                { id: 'madinah', label: 'Madinah' },
+                { id: 'bosnia', label: 'Bosnia' }
+              ].map(voice => (
+                <button
+                  key={voice.id}
+                  className={`salah__voice-btn ${adhanVoice === voice.id ? 'active' : ''}`}
+                  onClick={() => { setAdhanVoice(voice.id); if (playingAdhan) { audioInstance?.pause(); setPlayingAdhan(false); } }}
+                >
+                  {voice.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="salah__adhan-row">
+            <span style={{ fontSize: '0.875rem', color: 'white', fontWeight: 600 }}>Adhan Player</span>
+            <button
+              className={`salah__toggle-pill ${playingAdhan ? 'active' : ''}`}
+              onClick={playAdhanPreview}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}
+            >
+              {playingAdhan ? <VolumeX size={14} /> : <Volume2 size={14} />}
+              {playingAdhan ? 'Stop' : 'Test Voice'}
+            </button>
+          </div>
+
+          <div className="salah__adhan-row">
+            <span style={{ fontSize: '0.875rem', color: 'white', fontWeight: 600 }}>Audio Triggers</span>
+            <button
+              className={`salah__toggle-pill ${adhanEnabled ? 'active' : ''}`}
+              onClick={() => setAdhanEnabled(!adhanEnabled)}
+            >
+              {adhanEnabled ? 'Enabled' : 'Disabled'}
+            </button>
+          </div>
+        </div>
+      </GlassCard>
 
       {/* Sunnah Prayers Checklist */}
       <GlassCard className="salah__sunnah-card" style={{ marginBottom: '1.5rem' }}>

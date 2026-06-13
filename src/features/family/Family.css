@@ -368,3 +368,127 @@
   border-radius: 9999px;
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
+
+/* Family Activity Feed */
+.family__activity-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  transition: all var(--transition-base);
+}
+
+.family__activity-card:hover {
+  background: var(--glass-bg);
+  transform: translateX(2px);
+}
+
+.family__activity-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.family__activity-avatar {
+  font-size: 1.25rem;
+}
+
+.family__activity-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.family__activity-name {
+  font-weight: 700;
+  color: white;
+}
+
+.family__activity-detail {
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.family__activity-xp {
+  color: var(--color-emerald);
+  font-weight: 700;
+  margin-left: 0.25rem;
+}
+
+.family__activity-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.family__activity-time {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+}
+
+.family__activity-like-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.family__activity-like-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.family__activity-like-btn.liked {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #EF4444 !important;
+  border-color: #EF4444 !important;
+}
+
+/* Challenge Form */
+.family__challenge-form {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.family__challenge-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.family__challenge-form-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.family__challenge-form-input {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.75rem;
+  color: white;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.family__challenge-form-input:focus {
+  border-color: var(--color-emerald);
+}
