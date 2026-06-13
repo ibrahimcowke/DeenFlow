@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Bookmark, Search, Target, ArrowRight, Award, Settings, X, Plus, Minus } from 'lucide-react';
@@ -88,7 +88,198 @@ const getSurahForPage = (page) => {
   return surah;
 };
 
+// ─── Ayah Stepper Picker ─────────────────────────────────────────────────────
+function AyahStepper({ label, value, min, max, onChange }) {
+  const canDec = value > min;
+  const canInc = value < max;
+
+  // Press-and-hold support
+  const holdRef = useRef(null);
+  const startHold = (dir) => {
+    const step = () => {
+      onChange(prev => {
+        const next = prev + dir;
+        if (next < min || next > max) return prev;
+        return next;
+      });
+    };
+    step();
+    holdRef.current = setInterval(step, 120);
+  };
+  const stopHold = () => clearInterval(holdRef.current);
+
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+      <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+        {label}
+      </span>
+
+      {/* + button */}
+      <button
+        type="button"
+        onMouseDown={() => startHold(1)}
+        onMouseUp={stopHold}
+        onMouseLeave={stopHold}
+        onTouchStart={() => startHold(1)}
+        onTouchEnd={stopHold}
+        disabled={!canInc}
+        style={{
+          width: 44, height: 44, borderRadius: '50%',
+          border: canInc ? '1.5px solid rgba(16,185,129,0.35)' : '1.5px solid var(--glass-border)',
+          background: canInc ? 'rgba(16,185,129,0.10)' : 'transparent',
+          color: canInc ? 'var(--color-emerald)' : 'var(--text-muted)',
+          fontSize: '1.4rem', fontWeight: 700,
+          cursor: canInc ? 'pointer' : 'not-allowed',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'all 0.15s ease',
+          lineHeight: 1,
+        }}
+      >＋</button>
+
+      {/* Value display */}
+      <div style={{
+        width: '100%',
+        padding: '0.6rem 0',
+        background: 'rgba(16,185,129,0.07)',
+        border: '1px solid rgba(16,185,129,0.18)',
+        borderRadius: '14px',
+        textAlign: 'center',
+      }}>
+        <span style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--color-emerald)', lineHeight: 1 }}>
+          {value}
+        </span>
+      </div>
+
+      {/* - button */}
+      <button
+        type="button"
+        onMouseDown={() => startHold(-1)}
+        onMouseUp={stopHold}
+        onMouseLeave={stopHold}
+        onTouchStart={() => startHold(-1)}
+        onTouchEnd={stopHold}
+        disabled={!canDec}
+        style={{
+          width: 44, height: 44, borderRadius: '50%',
+          border: canDec ? '1.5px solid rgba(16,185,129,0.35)' : '1.5px solid var(--glass-border)',
+          background: canDec ? 'rgba(16,185,129,0.10)' : 'transparent',
+          color: canDec ? 'var(--color-emerald)' : 'var(--text-muted)',
+          fontSize: '1.4rem', fontWeight: 700,
+          cursor: canDec ? 'pointer' : 'not-allowed',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'all 0.15s ease',
+          lineHeight: 1,
+        }}
+      >－</button>
+    </div>
+  );
+}
+
+function AyahScrollPicker({ totalAyahs, startAyah, endAyah, onStartChange, onEndChange }) {
+  const count = endAyah - startAyah + 1;
+
+  const handleStartChange = (updater) => {
+    const newVal = typeof updater === 'function' ? updater(startAyah) : updater;
+    onStartChange(newVal);
+    // Push end forward if it fell behind
+    if (endAyah < newVal) onEndChange(newVal);
+  };
+
+  const handleEndChange = (updater) => {
+    const newVal = typeof updater === 'function' ? updater(endAyah) : updater;
+    onEndChange(newVal);
+  };
+
+  return (
+    <div style={{ marginTop: '1.25rem', width: '100%' }}>
+      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+
+        {/* Start stepper */}
+        <AyahStepper
+          label="From"
+          value={startAyah}
+          min={1}
+          max={totalAyahs}
+          onChange={handleStartChange}
+        />
+
+        {/* Live count badge in centre */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.2rem',
+          minWidth: 52,
+          paddingTop: '1.6rem', // align with value display
+        }}>
+          <motion.span
+            key={count}
+            initial={{ scale: 1.4, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            style={{
+              fontSize: '1.75rem',
+              fontWeight: 900,
+              color: count > 0 ? 'var(--color-gold)' : 'var(--text-muted)',
+              lineHeight: 1,
+            }}
+          >
+            {count}
+          </motion.span>
+          <span style={{ fontSize: '0.55rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Ayah{count !== 1 ? 's' : ''}
+          </span>
+          <span style={{ fontSize: '0.5rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>selected</span>
+        </div>
+
+        {/* End stepper */}
+        <AyahStepper
+          label="To"
+          value={endAyah}
+          min={startAyah}
+          max={totalAyahs}
+          onChange={handleEndChange}
+        />
+      </div>
+
+      {/* Progress bar showing fraction of surah selected */}
+      <div style={{ marginTop: '1rem', position: 'relative' }}>
+        <div style={{
+          height: 6, borderRadius: 99,
+          background: 'rgba(255,255,255,0.06)',
+          border: '1px solid var(--glass-border)',
+          overflow: 'hidden',
+        }}>
+          <motion.div
+            animate={{ width: `${(count / totalAyahs) * 100}%` }}
+            transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+            style={{
+              height: '100%',
+              background: 'linear-gradient(90deg, var(--color-emerald), var(--color-gold))',
+              borderRadius: 99,
+            }}
+          />
+        </div>
+        <div style={{
+          display: 'flex', justifyContent: 'space-between',
+          marginTop: '0.3rem',
+          fontSize: '0.6rem', color: 'var(--text-muted)',
+        }}>
+          <span>Ayah {startAyah}</span>
+          <span style={{ color: 'var(--color-emerald)', fontWeight: 600 }}>
+            {Math.round((count / totalAyahs) * 100)}% of Surah
+          </span>
+          <span>Ayah {endAyah}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+// ────────────────────────────────────────────────────────────────────────────
+
+
 export default function Quran() {
+
   const navigate = useNavigate();
   const { quranProgress, goals, setGoals, quranBookmarks, userProfile } = useAppStore();
   const [activeTab, setActiveTab] = useState('All');
@@ -275,50 +466,16 @@ export default function Quran() {
                       </div>
 
                       {selectedSurah && (
-                        <>
-                          <div style={{ flex: '1 1 100px', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                            <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Start Ayah</label>
-                            <select
-                              className="quran__form-select"
-                              value={selectedAyah}
-                              onChange={(e) => {
-                                setSelectedAyah(e.target.value);
-                                if (parseInt(selectedEndAyah) < parseInt(e.target.value)) {
-                                  setSelectedEndAyah(e.target.value);
-                                }
-                              }}
-                            >
-                              {Array.from(
-                                { length: ALL_SURAH_META[parseInt(selectedSurah) - 1].ayahs },
-                                (_, idx) => idx + 1
-                              ).map((ayahNum) => (
-                                <option key={ayahNum} value={ayahNum}>
-                                  Ayah {ayahNum}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <div style={{ flex: '1 1 100px', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                            <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>End Ayah</label>
-                            <select
-                              className="quran__form-select"
-                              value={selectedEndAyah}
-                              onChange={(e) => setSelectedEndAyah(e.target.value)}
-                            >
-                              {Array.from(
-                                { length: ALL_SURAH_META[parseInt(selectedSurah) - 1].ayahs },
-                                (_, idx) => idx + 1
-                              )
-                                .filter(ayahNum => ayahNum >= parseInt(selectedAyah))
-                                .map((ayahNum) => (
-                                  <option key={ayahNum} value={ayahNum}>
-                                    Ayah {ayahNum}
-                                  </option>
-                                ))}
-                            </select>
-                          </div>
-                        </>
+                        <AyahScrollPicker
+                          totalAyahs={ALL_SURAH_META[parseInt(selectedSurah) - 1].ayahs}
+                          startAyah={parseInt(selectedAyah)}
+                          endAyah={parseInt(selectedEndAyah)}
+                          onStartChange={(v) => {
+                            setSelectedAyah(String(v));
+                            if (parseInt(selectedEndAyah) < v) setSelectedEndAyah(String(v));
+                          }}
+                          onEndChange={(v) => setSelectedEndAyah(String(v))}
+                        />
                       )}
                     </div>
                     {selectedSurah && (
