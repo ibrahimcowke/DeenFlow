@@ -5,13 +5,37 @@ import {
   Flame, Shield, Activity, BookOpen, BrainCircuit, Calendar, Award, 
   MessageSquare, Phone, Lock, Unlock, Settings, AlertCircle, Plus, X, 
   ChevronRight, UserCheck, Heart, Info, HelpCircle, Share2, Power, EyeOff, 
-  Timer, Trash2, CheckCircle2, MessageCircle
+  Timer, Trash2, CheckCircle2, MessageCircle, ShieldAlert, Users, BarChart3, History
 } from 'lucide-react';
 import GlassCard from '../../components/ui/GlassCard';
 import RingProgress from '../../components/ui/RingProgress';
 import Button from '../../components/ui/Button';
 import { useAppStore } from '../../store';
 import './Recovery.css';
+
+const MosqueIcon = ({ size = 20, className = "" }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    width={size} 
+    height={size} 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+    style={{ filter: 'drop-shadow(0 0 4px currentColor)' }}
+  >
+    <path d="M12 3c-2.5 0-4.5 2.5-4.5 5.5v2h9V8.5c0-3-2-5.5-4.5-5.5Z" />
+    <path d="M4 21V9.5L6 8v13M3 21h4" />
+    <path d="M20 21V9.5L18 8v13M21 21h-4" />
+    <path d="M6 21h12V10.5H6Z" />
+    <path d="M10 21v-4c0-1.1.9-2 2-2s2 .9 2 2v4" />
+    <path d="M5 8V6M19 8V6" />
+    <path d="M12 3V1.5" />
+  </svg>
+);
 
 const ACHIEVEMENTS = [
   { days: 3, title: 'First Steps', desc: 'Maintain sobriety for 3 days', emoji: '🎯' },
@@ -549,7 +573,12 @@ export default function Recovery() {
                 {/* Form to Log Urges */}
                 <div className="waaci__sub-col">
                   <GlassCard padding="lg">
-                    <h2 className="waaci__sub-title">Log Urge Encounter</h2>
+                    <div className="waaci__section-header">
+                      <div className="waaci__icon-wrapper rose">
+                        <Flame size={20} />
+                      </div>
+                      <h2 className="waaci__sub-title">Log Urge Encounter</h2>
+                    </div>
                     <p className="waaci__sub-desc">Log your cravings to map out patterns and protect yourself.</p>
                     
                     <form onSubmit={handleLogUrgeSubmit} className="waaci__form">
@@ -665,7 +694,12 @@ export default function Recovery() {
                 {/* Trigger Analysis & Patterns */}
                 <div className="waaci__sub-col">
                   <GlassCard padding="lg">
-                    <h2 className="waaci__sub-title">Trigger Pattern Analysis</h2>
+                    <div className="waaci__section-header">
+                      <div className="waaci__icon-wrapper gold">
+                        <BarChart3 size={20} />
+                      </div>
+                      <h2 className="waaci__sub-title">Trigger Pattern Analysis</h2>
+                    </div>
                     <p className="waaci__sub-desc">Identify which situations require cognitive firewalling.</p>
 
                     <div className="waaci__trigger-dashboard">
@@ -701,7 +735,12 @@ export default function Recovery() {
                   {/* Urge History Feed */}
                   <div style={{ marginTop: '1.5rem' }} />
                   <GlassCard padding="lg">
-                    <h2 className="waaci__sub-title">Recent Encounters</h2>
+                    <div className="waaci__section-header">
+                      <div className="waaci__icon-wrapper purple">
+                        <History size={20} />
+                      </div>
+                      <h2 className="waaci__sub-title">Recent Encounters</h2>
+                    </div>
                     <div className="waaci__timeline-feed">
                       {(recovery.logs || []).length === 0 ? (
                         <p className="waaci__empty-msg">No urges logged yet. Stay clean!</p>
@@ -746,7 +785,12 @@ export default function Recovery() {
                 {/* Journal Add Form */}
                 <div className="waaci__sub-col">
                   <GlassCard padding="lg">
-                    <h2 className="waaci__sub-title">Recovery Journal</h2>
+                    <div className="waaci__section-header">
+                      <div className="waaci__icon-wrapper">
+                        <BookOpen size={20} />
+                      </div>
+                      <h2 className="waaci__sub-title">Recovery Journal</h2>
+                    </div>
                     <p className="waaci__sub-desc">Log daily reflections, lessons learned, and victories to train self-awareness.</p>
 
                     <form onSubmit={handleJournalSubmit} className="waaci__form">
@@ -817,7 +861,12 @@ export default function Recovery() {
                 {/* Journal Feed */}
                 <div className="waaci__sub-col">
                   <GlassCard padding="lg">
-                    <h2 className="waaci__sub-title">Reflection Feed</h2>
+                    <div className="waaci__section-header">
+                      <div className="waaci__icon-wrapper gold">
+                        <MessageSquare size={20} />
+                      </div>
+                      <h2 className="waaci__sub-title">Reflection Feed</h2>
+                    </div>
                     <p className="waaci__sub-desc">Chronological journal of your recovery journey.</p>
                     
                     <div className="waaci__journal-list">
@@ -1009,7 +1058,12 @@ export default function Recovery() {
                 <div className="waaci__sub-col">
                   {/* Share invite code */}
                   <GlassCard padding="lg">
-                    <h2 className="waaci__sub-title">Accountability Partner</h2>
+                    <div className="waaci__section-header">
+                      <div className="waaci__icon-wrapper purple">
+                        <Users size={20} />
+                      </div>
+                      <h2 className="waaci__sub-title">Accountability Partner</h2>
+                    </div>
                     <p className="waaci__sub-desc">Invite a trusted friend or sponsor to share progress and keep you committed.</p>
 
                     <div className="waaci__sync-code-box">
@@ -1041,7 +1095,12 @@ export default function Recovery() {
                   {/* SOS Contacts List */}
                   <div style={{ marginTop: '1.5rem' }} />
                   <GlassCard padding="lg">
-                    <h2 className="waaci__sub-title">Emergency Sponsors (SOS)</h2>
+                    <div className="waaci__section-header">
+                      <div className="waaci__icon-wrapper rose">
+                        <ShieldAlert size={20} />
+                      </div>
+                      <h2 className="waaci__sub-title">Emergency Sponsors (SOS)</h2>
+                    </div>
                     <p className="waaci__sub-desc">Register accountability contacts to call or message directly during critical urge waves.</p>
 
                     <form onSubmit={handleAddContact} className="waaci__form-row-sos">
@@ -1094,7 +1153,12 @@ export default function Recovery() {
                   {/* Sobriety Motivations */}
                   <div style={{ marginTop: '1.5rem' }} />
                   <GlassCard padding="lg">
-                    <h2 className="waaci__sub-title">My Sobriety Reasons</h2>
+                    <div className="waaci__section-header">
+                      <div className="waaci__icon-wrapper gold">
+                        <MosqueIcon size={20} />
+                      </div>
+                      <h2 className="waaci__sub-title">My Sobriety Reasons</h2>
+                    </div>
                     <p className="waaci__sub-desc">Read these motivations during triggers to redirect cognitive focus.</p>
                     
                     <form onSubmit={handleAddReason} className="waaci__form-row-sos">
@@ -1125,8 +1189,10 @@ export default function Recovery() {
                 {/* Protection Mode App/Web Blocking */}
                 <div className="waaci__sub-col">
                   <GlassCard padding="lg">
-                    <div className="waaci__protection-header">
-                      <Lock size={20} className="waaci__shield-green" />
+                    <div className="waaci__section-header">
+                      <div className="waaci__icon-wrapper">
+                        <Lock size={20} />
+                      </div>
                       <h2 className="waaci__sub-title">Protection Mode</h2>
                     </div>
                     <p className="waaci__sub-desc">Limit screen time and block tempting web spaces to shield your focus.</p>

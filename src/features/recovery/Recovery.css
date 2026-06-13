@@ -1599,3 +1599,51 @@
   width: 0%;
   transition: width 0.1s linear;
 }
+
+/* Redesigned Premium Section Headers */
+.waaci__section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.waaci__icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-xl);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  color: var(--color-emerald);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+  transition: all var(--transition-base);
+}
+
+.waaci__icon-wrapper.gold {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+  color: var(--color-gold);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.05);
+}
+
+.waaci__icon-wrapper.purple {
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  color: #8B5CF6;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.05);
+}
+
+.waaci__icon-wrapper.rose {
+  background: rgba(244, 63, 94, 0.08);
+  border: 1px solid rgba(244, 63, 94, 0.15);
+  color: #F43F5E;
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.05);
+}
+
+.waaci__section-header:hover .waaci__icon-wrapper {
+  transform: scale(1.08) rotate(5deg);
+  box-shadow: 0 0 15px currentColor;
+}
