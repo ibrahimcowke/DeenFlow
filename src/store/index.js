@@ -1,6 +1,7 @@
 // Zustand Global Store — Muslim Life OS
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { MORNING_AZKAR, EVENING_AZKAR, AFTER_SALAH_AZKAR } from '../utils/islamicData';
 
 export const useAppStore = create(
   persist(
@@ -109,9 +110,9 @@ export const useAppStore = create(
 
       // ── Azkar ─────────────────────────────────────────────
       azkarProgress: {
-        morning: { completed: 0, total: 0, done: false },
-        evening: { completed: 0, total: 0, done: false },
-        afterSalah: { completed: 0, total: 0, done: false },
+        morning: { completed: 0, total: MORNING_AZKAR.length, done: false },
+        evening: { completed: 0, total: EVENING_AZKAR.length, done: false },
+        afterSalah: { completed: 0, total: AFTER_SALAH_AZKAR.length, done: false },
       },
       azkarStreak: 0,
       setAzkarProgress: (cat, data) => set((s) => ({
@@ -315,7 +316,9 @@ export const useAppStore = create(
         const salahCount = Object.values(s.todaySalah).filter(p => p.completed).length;
         const salahScore = (salahCount / 5) * 40;
         const quranScore = Math.min((s.quranProgress.todayPages / s.goals.quranPagesDaily), 1) * 25;
-        const azkarDone = Object.values(s.azkarProgress).filter(a => a.done).length;
+        const azkarDone = Object.values(s.azkarProgress).filter(
+          a => a.done || (a.total > 0 && a.completed >= a.total)
+        ).length;
         const azkarScore = (azkarDone / 3) * 20;
         const habitDone = s.habits.filter(h => h.completedToday).length;
         const habitScore = Math.min((habitDone / 5), 1) * 15;

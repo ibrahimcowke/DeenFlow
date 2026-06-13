@@ -34,7 +34,8 @@ const BOTTOM_ITEMS = [
 
 export default function Sidebar({ mobileOpen, setMobileOpen }) {
   const { t } = useTranslation();
-  const { sidebarCollapsed, setSidebarCollapsed, userProfile, setUser } = useAppStore();
+  const { sidebarCollapsed, setSidebarCollapsed, userProfile, setUser, getDeenScore } = useAppStore();
+  const deenScore = getDeenScore();
 
   const handleSignOut = async () => {
     if (window.confirm(t('confirm_logout', 'Are you sure you want to log out?'))) {
@@ -173,11 +174,11 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
               <motion.div
                 className="sidebar__footer-fill"
                 initial={{ width: 0 }}
-                animate={{ width: '72%' }}
+                animate={{ width: `${deenScore}%` }}
                 transition={{ duration: 1.2, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
               />
             </div>
-            <span className="sidebar__footer-val">72%</span>
+            <span className="sidebar__footer-val">{deenScore}%</span>
           </div>
         </motion.div>
       )}

@@ -84,7 +84,12 @@ export default function Azkar() {
     
     if (next >= target && current < target) {
       const completedCount = currentAzkarList.filter(a => (nextCounters[a.id] || 0) >= a.count).length;
-      setAzkarProgress(activeAzkarCategory, { completed: completedCount });
+      const totalCount = currentAzkarList.length;
+      setAzkarProgress(activeAzkarCategory, { 
+        completed: completedCount,
+        total: totalCount,
+        done: completedCount === totalCount
+      });
     }
   };
 
