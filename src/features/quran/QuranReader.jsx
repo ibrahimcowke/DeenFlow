@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { 
@@ -69,15 +69,19 @@ export default function QuranReader() {
   const searchParams = new URLSearchParams(location.search);
   const typeParam = searchParams.get('type') || 'surah';
   const idParam = searchParams.get('id');
+  const startAyahParam = searchParams.get('startAyah');
+  const endAyahParam = searchParams.get('endAyah');
 
   const readType = surahParam ? 'surah' : typeParam;
   const readId = surahParam ? parseInt(surahParam) : (idParam ? parseInt(idParam) : 1);
+  const isAyahRangeMode = readType === 'surah' && startAyahParam !== null;
 
   const [surahData, setSurahData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
   const [currentAyah, setCurrentAyah] = useState(0);
+  const [sessionReadAyahs, setSessionReadAyahs] = useState({});
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [fontSize, setFontSize] = useState(() => {
     return window.innerWidth < 768 ? 20 : 28;
@@ -111,6 +115,138 @@ export default function QuranReader() {
     : readId;
 
   const isBookmarked = quranBookmarks.some(b => b.surah === activeSurahId && b.ayah === (surahData?.ayahs[currentAyah]?.number || 1));
+
+  // Helper to get session rewards
+  const getSessionRewards = () => {
+    let totalLetters = 0;
+    Object.values(sessionReadAyahs).forEach(ayah => {
+      const letters = (ayah.arabic.match(/[\u0621-\u064A]/g) || []).length;
+      totalLetters += letters;
+    });
+    const hasanat = totalLetters * 10;
+    const xp = Object.keys(sessionReadAyahs).length; // 1 XP per ayah
+    return { letters: totalLetters, hasanat, xp };
+  };
+
+  // Helper to flush session rewards
+  const flushSessionRewards = () => {
+    const ayahsCount = Object.keys(sessionReadAyahs).length;
+    if (ayahsCount === 0) return;
+
+    const { letters, hasanat, xp } = getSessionRewards();
+
+    // Level up calculation
+    const currentLevel = userProfile.level || 1;
+    const nextLevelXp = currentLevel * 100;
+    let newXp = (userProfile.xp || 0) + xp;
+    let newLevel = currentLevel;
+    
+    if (newXp >= nextLevelXp) {
+      newXp = newXp - nextLevelXp;
+      newLevel += 1;
+    }
+
+    // Commit to user profile
+    setUserProfile({ 
+      xp: newXp, 
+      level: newLevel,
+      totalHasanat: (userProfile.totalHasanat || 0) + hasanat
+    });
+
+    const progress = useAppStore.getState().quranProgress;
+    let newStreak = progress.streak || 0;
+    if (progress.todayPages === 0 && xp > 0) {
+      newStreak += 1;
+    }
+    const pagesGained = Math.max(1, Math.ceil(xp / 15));
+
+    setQuranProgress({
+      lastSurah: activeSurahId,
+      lastAyah: surahData?.ayahs[currentAyah]?.number || 1,
+      lastPage: surahData?.page || 1,
+      todayPages: (progress.todayPages || 0) + pagesGained,
+      totalPages: (progress.totalPages || 0) + pagesGained,
+      streak: newStreak
+    });
+
+    // Clear sessionReadAyahs
+    setSessionReadAyahs({});
+  };
+
+  // Track each unique ayah read in the session
+  useEffect(() => {
+    if (surahData?.ayahs && surahData.ayahs[currentAyah]) {
+      const ayah = surahData.ayahs[currentAyah];
+      const key = `${ayah.surahNumber}_${ayah.number}`;
+      setSessionReadAyahs(prev => {
+        if (prev[key]) return prev;
+        return {
+          ...prev,
+          [key]: {
+            arabic: ayah.arabic,
+            surahNumber: ayah.surahNumber,
+            number: ayah.number
+          }
+        };
+      });
+    }
+  }, [currentAyah, surahData]);
+
+  // Keep a mutable reference of the state for the unmount hook
+  const stateRef = useRef({ sessionReadAyahs, userProfile, surahData, currentAyah });
+  useEffect(() => {
+    stateRef.current = { sessionReadAyahs, userProfile, surahData, currentAyah };
+  }, [sessionReadAyahs, userProfile, surahData, currentAyah]);
+
+  // Flush rewards automatically when the user leaves the reader component
+  useEffect(() => {
+    return () => {
+      const { sessionReadAyahs: curSession, userProfile: curProfile, surahData: curSurah, currentAyah: curIdx } = stateRef.current;
+      const ayahsCount = Object.keys(curSession).length;
+      if (ayahsCount === 0) return;
+
+      let totalLetters = 0;
+      Object.values(curSession).forEach(ayah => {
+        const letters = (ayah.arabic.match(/[\u0621-\u064A]/g) || []).length;
+        totalLetters += letters;
+      });
+      const hasanat = totalLetters * 10;
+      const xp = ayahsCount;
+
+      const currentLevel = curProfile.level || 1;
+      const nextLevelXp = currentLevel * 100;
+      let newXp = (curProfile.xp || 0) + xp;
+      let newLevel = currentLevel;
+      
+      if (newXp >= nextLevelXp) {
+        newXp = newXp - nextLevelXp;
+        newLevel += 1;
+      }
+
+      const store = useAppStore.getState();
+      store.setUserProfile({ 
+        xp: newXp, 
+        level: newLevel,
+        totalHasanat: (curProfile.totalHasanat || 0) + hasanat
+      });
+
+      const progress = store.quranProgress;
+      let newStreak = progress.streak || 0;
+      if (progress.todayPages === 0 && xp > 0) {
+        newStreak += 1;
+      }
+      const pagesGained = Math.max(1, Math.ceil(xp / 15));
+
+      store.setQuranProgress({
+        lastSurah: curSurah?.ayahs[curIdx]?.surahNumber || curSurah?.number || 1,
+        lastAyah: curSurah?.ayahs[curIdx]?.number || 1,
+        lastPage: curSurah?.page || 1,
+        todayPages: (progress.todayPages || 0) + pagesGained,
+        totalPages: (progress.totalPages || 0) + pagesGained,
+        streak: newStreak
+      });
+    };
+  }, []);
 
   // Fetch Surah/Juz/Page/Hizb/HizbQuarter from API or load local offline fallback
   useEffect(() => {
@@ -253,61 +389,7 @@ export default function QuranReader() {
   }, [audio]);
 
   const claimRewardAndFinish = () => {
-    if (!surahData) return;
-
-    let xpGained = 0;
-    let pagesRead = 1;
-    
-    if (readType === 'surah') {
-      xpGained = surahData.ayahs.length * 1;
-      pagesRead = Math.max(1, Math.ceil(surahData.ayahs.length / 15));
-    } else if (readType === 'page') {
-      xpGained = 15;
-      pagesRead = 1;
-    } else if (readType === 'hizbQuarter') {
-      xpGained = 40;
-      pagesRead = 3;
-    } else if (readType === 'hizb') {
-      xpGained = 150;
-      pagesRead = 10;
-    } else if (readType === 'juz') {
-      xpGained = 300;
-      pagesRead = 20;
-    }
-
-    // Level up calculation
-    const currentLevel = userProfile.level || 1;
-    const nextLevelXp = currentLevel * 100;
-    let newXp = (userProfile.xp || 0) + xpGained;
-    let newLevel = currentLevel;
-    
-    if (newXp >= nextLevelXp) {
-      newXp = newXp - nextLevelXp;
-      newLevel += 1;
-    }
-
-    // Commit to store
-    setUserProfile({ 
-      xp: newXp, 
-      level: newLevel,
-      totalHasanat: (userProfile.totalHasanat || 0) + totalHasanatGained
-    });
-
-    const progress = useAppStore.getState().quranProgress;
-    let newStreak = progress.streak || 0;
-    if (progress.todayPages === 0) {
-      newStreak += 1;
-    }
-
-    setQuranProgress({
-      lastSurah: activeSurahId,
-      lastAyah: surahData.ayahs[currentAyah]?.number || 1,
-      lastPage: surahData.page || 1,
-      todayPages: (progress.todayPages || 0) + pagesRead,
-      totalPages: (progress.totalPages || 0) + pagesRead,
-      streak: newStreak
-    });
-
+    flushSessionRewards();
     setShowCompletionModal(false);
     navigate('/quran');
   };
@@ -332,6 +414,7 @@ export default function QuranReader() {
       setCurrentAyah(i => i - 1);
     } else {
       // Go to previous Surah / Page / Juz / Hizb / HizbQuarter
+      flushSessionRewards();
       if (readType === 'surah' && readId > 1) {
         navigate(`/quran/reader/${readId - 1}`);
       } else if (readType === 'page' && readId > 1) {
@@ -352,6 +435,7 @@ export default function QuranReader() {
       setCurrentAyah(i => i + 1);
     } else {
       // Go to next Surah / Page / Juz / Hizb / HizbQuarter
+      flushSessionRewards();
       if (readType === 'surah' && readId < 114) {
         navigate(`/quran/reader/${readId + 1}`);
       } else if (readType === 'page' && readId < 604) {
@@ -380,15 +464,7 @@ export default function QuranReader() {
     return () => clearTimeout(timer);
   }, [currentAyah, surahData]);
 
-  // Calculate letters read and Hasanat in render scope (1 letter = 10 Hasanat)
-  let totalLettersRead = 0;
-  if (surahData?.ayahs) {
-    surahData.ayahs.forEach(ayah => {
-      const letters = (ayah.arabic.match(/[\u0621-\u064A]/g) || []).length;
-      totalLettersRead += letters;
-    });
-  }
-  const totalHasanatGained = totalLettersRead * 10;
+  const sessionRewards = getSessionRewards();
 
   if (loading) {
     return (
@@ -430,7 +506,13 @@ export default function QuranReader() {
     <div className={`reader reader--theme-${readerTheme}`}>
       {/* Header */}
       <div className="reader__header">
-        <button className="reader__back" onClick={() => navigate('/quran')}>
+        <button 
+          className="reader__back" 
+          onClick={() => {
+            flushSessionRewards();
+            navigate('/quran');
+          }}
+        >
           <ArrowLeft size={20} />
         </button>
         <div className="reader__title-wrap">
@@ -726,7 +808,7 @@ export default function QuranReader() {
           </button>
           <span className="reader__ayah-counter-badge">{currentAyah + 1}/{surahData.ayahs.length}</span>
           
-          {currentAyah === surahData.ayahs.length - 1 ? (
+          {isAyahRangeMode && currentAyah === surahData.ayahs.length - 1 ? (
             <button 
               className="reader__nav-btn" 
               onClick={() => setShowCompletionModal(true)}
@@ -780,25 +862,19 @@ export default function QuranReader() {
                 <div className="reader__modal-stat-row">
                   <span className="reader__modal-stat-label">Letters Read:</span>
                   <span className="reader__modal-stat-value" style={{ fontWeight: 700 }}>
-                    {totalLettersRead} Huroof
+                    {sessionRewards.letters} Huroof
                   </span>
                 </div>
                 <div className="reader__modal-stat-row" style={{ color: 'var(--color-gold)' }}>
                   <span className="reader__modal-stat-label" style={{ color: 'var(--color-gold)' }}>Hasanat Gained:</span>
                   <span className="reader__modal-stat-value" style={{ fontWeight: 800 }}>
-                    ✨ +{totalHasanatGained}
+                    ✨ +{sessionRewards.hasanat}
                   </span>
                 </div>
                 <div className="reader__modal-stat-row" style={{ borderTop: '1px solid var(--glass-border)', paddingTop: '0.75rem', marginTop: '0.25rem' }}>
                   <span className="reader__modal-stat-label">Spiritual Reward:</span>
                   <span className="reader__modal-reward">
-                    🌟 +{
-                      readType === 'surah' ? surahData.ayahs.length * 1
-                      : readType === 'page' ? 15
-                      : readType === 'hizbQuarter' ? 40
-                      : readType === 'hizb' ? 150
-                      : 300
-                    } XP
+                    🌟 +{sessionRewards.xp} XP
                   </span>
                 </div>
               </div>
