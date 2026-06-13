@@ -347,18 +347,12 @@ function AyahScrollPicker({ totalAyahs, startAyah, endAyah, onStartChange, onEnd
 
 
 export default function Quran() {
-
   const navigate = useNavigate();
   const { quranProgress, goals, setGoals, quranBookmarks, userProfile } = useAppStore();
-  const [activeTab, setActiveTab] = useState('All');
   const [search, setSearch] = useState('');
-  
-  // Edit Goal modal state
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [tempGoalType, setTempGoalType] = useState(goals.quranGoalType || 'page');
   const [tempGoalValue, setTempGoalValue] = useState(goals.quranGoalValue || 5);
-
-  // Selector drop-down states
   const [activeSelectorMode, setActiveSelectorMode] = useState('surah');
   const [selectedSurah, setSelectedSurah] = useState('');
   const [selectedAyah, setSelectedAyah] = useState('1');
@@ -370,7 +364,6 @@ export default function Quran() {
 
   const goalPct = Math.min((quranProgress.todayPages / goals.quranPagesDaily) * 100, 100);
 
-  // Search filter across the full 114 Surahs
   const filteredSurahs = SURAH_NAMES
     .map((name, i) => ({ name, arabic: SURAH_ARABIC_NAMES[i], number: i + 1, ...ALL_SURAH_META[i] }))
     .filter(s => s.name.toLowerCase().includes(search.toLowerCase()) || s.arabic.includes(search));
@@ -382,399 +375,290 @@ export default function Quran() {
     else if (tempGoalType === 'hizb') calculatedPages = tempGoalValue * 10;
     else if (tempGoalType === 'maqrah') calculatedPages = Math.ceil(tempGoalValue * 2.5);
     else if (tempGoalType === 'ayah') calculatedPages = Math.ceil(tempGoalValue / 15);
-
-    setGoals({
-      quranGoalType: tempGoalType,
-      quranGoalValue: tempGoalValue,
-      quranPagesDaily: calculatedPages
-    });
+    setGoals({ quranGoalType: tempGoalType, quranGoalValue: tempGoalValue, quranPagesDaily: calculatedPages });
     setShowGoalModal(false);
   };
 
+  const isReadyToStart =
+    activeSelectorMode === 'surah' ? !!selectedSurah
+    : activeSelectorMode === 'juz' ? !!selectedJuz
+    : activeSelectorMode === 'hizb' ? !!selectedHizb
+    : activeSelectorMode === 'hizbQuarter' ? !!selectedMaqrah
+    : !!selectedPage;
+
+  const handleStart = () => {
+    if (activeSelectorMode === 'surah')
+      navigate(`/quran/reader/${selectedSurah}?startAyah=${selectedAyah}&endAyah=${selectedEndAyah}`);
+    else if (activeSelectorMode === 'juz')
+      navigate(`/quran/reader?type=juz&id=${selectedJuz}`);
+    else if (activeSelectorMode === 'hizb')
+      navigate(`/quran/reader?type=hizb&id=${selectedHizb}`);
+    else if (activeSelectorMode === 'hizbQuarter')
+      navigate(`/quran/reader?type=hizbQuarter&id=${selectedMaqrah}`);
+    else
+      navigate(`/quran/reader?type=page&id=${selectedPage}`);
+  };
+
+  function NumGrid({ count, selected, onSelect, label }) {
+    return (
+      <div>
+        <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.6rem', fontWeight: 600 }}>
+          Tap to select {label}
+        </p>
+        <div className="quran__num-grid">
+          {Array.from({ length: count }, (_, i) => i + 1).map(n => (
+            <motion.button
+              key={n} type="button"
+              whileTap={{ scale: 0.88 }}
+              onClick={() => onSelect(String(n))}
+              className={`quran__num-cell ${selected === String(n) ? 'quran__num-cell--active' : ''}`}
+            >{n}</motion.button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="quran page-container">
-      {/* Header */}
-      <motion.div className="quran__header" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="quran__title">
-          <span className="text-gradient-emerald">Quran</span> Center
-        </h1>
-        <p className="quran__sub">القرآن الكريم</p>
-      </motion.div>
 
-      {/* Goal Card */}
-      <GlassCard className="quran__goal-card" delay={0.1} glow>
-        <div className="quran__goal-body">
-          <div className="quran__goal-left">
-            <div className="quran__goal-icon">📖</div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <h3 className="quran__goal-title">Daily Goal</h3>
-                <button 
-                  onClick={() => {
-                    setTempGoalType(goals.quranGoalType || 'page');
-                    setTempGoalValue(goals.quranGoalValue || 5);
-                    setShowGoalModal(true);
-                  }}
-                  className="quran__edit-goal-btn"
-                  title="Change daily reading goal"
-                >
-                  <Settings size={14} />
-                  <span>Edit Goal</span>
-                </button>
+      {/* ── Hero ──────────────────────────────────────── */}
+      <motion.div className="quran__hero" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+        <div className="quran__hero-content">
+          <div className="quran__hero-badge">📖 Quran Center</div>
+          <h1 className="quran__hero-title">
+            <span style={{ background: 'linear-gradient(135deg,#10b981,#f59e0b)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Al-Quran</span>{' '}Al-Karim
+          </h1>
+          <span className="quran__hero-arabic">القرآن الكريم</span>
+          <p className="quran__hero-sub">Read, reflect, and earn Hasanat with every letter</p>
+
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div className="quran__hero-stats">
+              <div className="quran__hero-stat">
+                <span className="quran__hero-stat-val">{quranProgress.streak}🔥</span>
+                <span className="quran__hero-stat-label">Day Streak</span>
               </div>
-              <p className="quran__goal-pgs">
-                {quranProgress.todayPages} / {goals.quranPagesDaily} pages 
-                {goals.quranGoalType && ` (${goals.quranGoalValue} ${goals.quranGoalType}${goals.quranGoalValue > 1 ? 's' : ''})`}
-              </p>
-              <p className="quran__goal-last">Last: Surah Al-Baqarah · Page {quranProgress.lastPage}</p>
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--color-emerald)' }}>🔥 {quranProgress.streak} day streak</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Total: {quranProgress.totalPages} pages</span>
+              <div className="quran__hero-stat">
+                <span className="quran__hero-stat-val" style={{ color: 'var(--color-gold)' }}>{(userProfile.totalHasanat || 0).toLocaleString()}✨</span>
+                <span className="quran__hero-stat-label">Hasanat</span>
+              </div>
+              <div className="quran__hero-stat">
+                <span className="quran__hero-stat-val">{quranProgress.totalPages}</span>
+                <span className="quran__hero-stat-label">Pages Read</span>
               </div>
             </div>
+            <div style={{ marginLeft: 'auto' }}>
+              <RingProgress value={goalPct} size={78} stroke={6} color="var(--color-emerald)" glow animated>
+                <span style={{ fontSize: '0.85rem', fontWeight: 900, color: 'var(--color-emerald)' }}>{Math.round(goalPct)}%</span>
+              </RingProgress>
+            </div>
           </div>
-          <RingProgress value={goalPct} size={90} stroke={7} color="var(--color-emerald)" glow animated>
-            <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-emerald)' }}>{Math.round(goalPct)}%</span>
-          </RingProgress>
-        </div>
-        <Button variant="primary" size="lg" fullWidth icon={BookOpen} onClick={() => navigate('/quran/reader')}>
-          Continue Reading
-        </Button>
-      </GlassCard>
 
-      {/* Stats Row */}
+          <button onClick={() => navigate('/quran/reader')} style={{ marginTop: '1.1rem', width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: 'none', background: 'linear-gradient(90deg,#10b981,#059669)', color: 'white', fontWeight: 800, fontSize: '0.88rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 20px rgba(16,185,129,0.35)', fontFamily: 'var(--font-sans)' }}>
+            <BookOpen size={15} /> Continue Reading · Page {quranProgress.lastPage}
+          </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.7rem' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+              Daily: {quranProgress.todayPages}/{goals.quranPagesDaily} pages{goals.quranGoalType && ` · ${goals.quranGoalValue} ${goals.quranGoalType}`}
+            </span>
+            <button onClick={() => { setTempGoalType(goals.quranGoalType || 'page'); setTempGoalValue(goals.quranGoalValue || 5); setShowGoalModal(true); }} className="quran__edit-goal-btn">
+              <Settings size={11} /> Edit Goal
+            </button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Stats ─────────────────────────────────────── */}
       <div className="quran__stats-row">
         {[
-          { icon: '📜', label: 'Pages Read', val: quranProgress.totalPages },
-          { icon: '🔥', label: 'Day Streak', val: `${quranProgress.streak}d` },
-          { icon: '✨', label: 'Hasanat Earned', val: userProfile.totalHasanat || 0 },
-          { icon: '⭐', label: 'Bookmarks', val: quranBookmarks.length },
+          { icon: '📜', label: 'Pages', val: quranProgress.totalPages },
+          { icon: '🔥', label: 'Streak', val: `${quranProgress.streak}d` },
+          { icon: '✨', label: 'Hasanat', val: (userProfile.totalHasanat || 0).toLocaleString() },
+          { icon: '⭐', label: 'Saved', val: quranBookmarks.length },
         ].map((s, i) => (
-          <GlassCard key={s.label} className="quran__stat-card" delay={0.15 + i * 0.05} padding="sm">
+          <motion.div key={s.label} className="quran__stat-card" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.06 }}>
             <span className="quran__stat-icon">{s.icon}</span>
             <span className="quran__stat-val">{s.val}</span>
             <span className="quran__stat-label">{s.label}</span>
-          </GlassCard>
+          </motion.div>
         ))}
       </div>
 
-      {/* Search */}
+      {/* ── Search ────────────────────────────────────── */}
       <div className="quran__search">
-        <Search size={16} className="quran__search-icon" />
-        <input
-          type="text" placeholder="Search Surah..."
-          value={search} onChange={e => setSearch(e.target.value)}
-          className="quran__search-input"
-        />
+        <Search size={15} className="quran__search-icon" />
+        <input type="text" placeholder="Search surah by name or Arabic…" value={search} onChange={e => setSearch(e.target.value)} className="quran__search-input" />
+        {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0 }}><X size={13} /></button>}
       </div>
 
-      {/* Selector Dropdowns (shown when search is empty) */}
-      {!search ? (
-        <div style={{ marginBottom: '2rem' }}>
-          <GlassCard className="quran__unified-selector-card" padding="lg" hover={false} glow>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              
-              {/* Selector Mode Tabs */}
-              <div>
-                <h4 style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>🎯</span> Quick Selection Mode
-                </h4>
-                <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-                  {[
-                    { id: 'surah', label: 'Surah & Ayah', emoji: '📖' },
-                    { id: 'juz', label: 'Juz (Part)', emoji: '🕋' },
-                    { id: 'hizb', label: 'Hizb (Xizb)', emoji: '🌀' },
-                    { id: 'hizbQuarter', label: 'Maqrah (Quarter)', emoji: '💠' },
-                    { id: 'page', label: 'Page', emoji: '📜' }
-                  ].map(mode => (
-                    <button
-                      key={mode.id}
-                      type="button"
-                      onClick={() => setActiveSelectorMode(mode.id)}
-                      className={`quran__tab ${activeSelectorMode === mode.id ? 'quran__tab--active' : ''}`}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.35rem',
-                        border: activeSelectorMode === mode.id ? '1px solid var(--color-emerald)' : '1px solid var(--glass-border)',
-                        background: activeSelectorMode === mode.id ? 'rgba(16, 185, 129, 0.15)' : 'var(--glass-bg)'
-                      }}
-                    >
-                      <span>{mode.emoji}</span>
-                      <span>{mode.label}</span>
-                    </button>
-                  ))}
+      {/* ── Search results ────────────────────────────── */}
+      {search ? (
+        <motion.div className="quran__surah-list" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          {filteredSurahs.length === 0
+            ? <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem 0' }}>No surahs found</p>
+            : filteredSurahs.map((surah, i) => (
+              <motion.button key={surah.number} className="quran__surah-row" initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.015 }} onClick={() => navigate(`/quran/reader/${surah.number}`)}>
+                <div className="quran__surah-num">{surah.number}</div>
+                <div className="quran__surah-info">
+                  <div className="quran__surah-names">
+                    <span className="quran__surah-en">{surah.name}</span>
+                    <span className="quran__surah-badge">{surah.type}</span>
+                  </div>
+                  <span className="quran__surah-ar">{surah.arabic}</span>
                 </div>
-              </div>
+                <div className="quran__surah-right">
+                  <span className="quran__surah-ayahs">{surah.ayahs} ayahs</span>
+                  <ArrowRight size={13} style={{ color: 'var(--text-muted)' }} />
+                </div>
+              </motion.button>
+            ))}
+        </motion.div>
+      ) : (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
 
-              {/* Dynamic Inputs Container */}
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', borderRadius: '16px', padding: '1.25rem' }}>
+          {/* ── Quick Selection ──────────────────────── */}
+          <GlassCard padding="lg" hover={false} glow style={{ marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+              <Target size={15} style={{ color: 'var(--color-emerald)' }} />
+              <span style={{ fontWeight: 800, fontSize: '0.92rem' }}>Quick Selection</span>
+            </div>
+
+            <div className="quran__mode-tabs">
+              {[
+                { id: 'surah',       label: 'Surah',  emoji: '📖' },
+                { id: 'juz',         label: 'Juz',    emoji: '🕋' },
+                { id: 'hizb',        label: 'Xizb',   emoji: '🌀' },
+                { id: 'hizbQuarter', label: 'Maqrah', emoji: '💠' },
+                { id: 'page',        label: 'Page',   emoji: '📜' },
+              ].map(m => (
+                <button key={m.id} type="button" onClick={() => setActiveSelectorMode(m.id)} className={`quran__tab ${activeSelectorMode === m.id ? 'quran__tab--active' : ''}`}>
+                  {m.emoji} {m.label}
+                </button>
+              ))}
+            </div>
+
+            <AnimatePresence mode="wait">
+              <motion.div key={activeSelectorMode} className="quran__selector-panel" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
+
                 {activeSelectorMode === 'surah' && (
                   <div>
-                    <h5 style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Choose Surah & Ayah Range</h5>
-                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                      <div style={{ flex: '2 1 200px', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                        <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Surah</label>
-                        <select
-                          className="quran__form-select"
-                          value={selectedSurah}
-                          onChange={(e) => {
-                            setSelectedSurah(e.target.value);
-                            setSelectedAyah('1');
-                            setSelectedEndAyah('1');
-                          }}
-                        >
-                          <option value="" disabled>-- Choose Surah --</option>
-                          {SURAH_NAMES.map((name, i) => (
-                            <option key={i + 1} value={i + 1}>
-                              {i + 1}. {name} ({SURAH_ARABIC_NAMES[i]})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {selectedSurah && (
+                    <h5>Choose Surah &amp; Ayah Range</h5>
+                    <select className="quran__form-select" value={selectedSurah} onChange={e => { setSelectedSurah(e.target.value); setSelectedAyah('1'); setSelectedEndAyah('1'); }}>
+                      <option value="" disabled>— Select a Surah —</option>
+                      {SURAH_NAMES.map((name, i) => <option key={i + 1} value={i + 1}>{i + 1}. {name} ({SURAH_ARABIC_NAMES[i]})</option>)}
+                    </select>
+                    {selectedSurah && (
+                      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
                         <AyahScrollPicker
                           totalAyahs={ALL_SURAH_META[parseInt(selectedSurah) - 1].ayahs}
                           startAyah={parseInt(selectedAyah)}
                           endAyah={parseInt(selectedEndAyah)}
-                          onStartChange={(v) => {
-                            setSelectedAyah(String(v));
-                            if (parseInt(selectedEndAyah) < v) setSelectedEndAyah(String(v));
-                          }}
-                          onEndChange={(v) => setSelectedEndAyah(String(v))}
+                          onStartChange={v => { setSelectedAyah(String(v)); if (parseInt(selectedEndAyah) < v) setSelectedEndAyah(String(v)); }}
+                          onEndChange={v => setSelectedEndAyah(String(v))}
                         />
-                      )}
-                    </div>
-                    {selectedSurah && (
-                      <div style={{ 
-                        marginTop: '1rem', 
-                        padding: '0.65rem 0.85rem', 
-                        background: 'rgba(16, 185, 129, 0.08)', 
-                        border: '1px solid rgba(16, 185, 129, 0.15)', 
-                        borderRadius: '12px', 
-                        fontSize: '0.85rem', 
-                        color: 'var(--color-emerald)', 
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        fontWeight: 600
-                      }}>
-                        <span>📊</span> Selected: {parseInt(selectedEndAyah) - parseInt(selectedAyah) + 1} Ayah{parseInt(selectedEndAyah) - parseInt(selectedAyah) + 1 > 1 ? 's' : ''} to read
-                      </div>
+                      </motion.div>
                     )}
                   </div>
                 )}
 
-                {activeSelectorMode === 'juz' && (
-                  <div>
-                    <h5 style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Choose Juz (Part)</h5>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                      <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Juz Number (1 to 30)</label>
-                      <select
-                        className="quran__form-select"
-                        value={selectedJuz}
-                        onChange={(e) => setSelectedJuz(e.target.value)}
-                      >
-                        <option value="" disabled>-- Choose Juz --</option>
-                        {Array.from({ length: 30 }, (_, i) => i + 1).map((juz) => (
-                          <option key={juz} value={juz}>
-                            Juz {juz}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                )}
+                {activeSelectorMode === 'juz'         && <NumGrid count={30}  selected={selectedJuz}    onSelect={setSelectedJuz}    label="Juz" />}
+                {activeSelectorMode === 'hizb'        && <NumGrid count={60}  selected={selectedHizb}   onSelect={setSelectedHizb}   label="Xizb" />}
+                {activeSelectorMode === 'hizbQuarter' && <NumGrid count={240} selected={selectedMaqrah} onSelect={setSelectedMaqrah} label="Maqrah" />}
+                {activeSelectorMode === 'page'        && <NumGrid count={604} selected={selectedPage}   onSelect={setSelectedPage}   label="Page" />}
 
-                {activeSelectorMode === 'hizb' && (
-                  <div>
-                    <h5 style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Choose Xizb (Hizb)</h5>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                      <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Hizb Number (1 to 60)</label>
-                      <select
-                        className="quran__form-select"
-                        value={selectedHizb}
-                        onChange={(e) => setSelectedHizb(e.target.value)}
-                      >
-                        <option value="" disabled>-- Choose Xizb --</option>
-                        {Array.from({ length: 60 }, (_, i) => i + 1).map((hizb) => (
-                          <option key={hizb} value={hizb}>
-                            Hizb {hizb}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                )}
+              </motion.div>
+            </AnimatePresence>
 
-                {activeSelectorMode === 'hizbQuarter' && (
-                  <div>
-                    <h5 style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Choose Maqrah (Hizb Quarter)</h5>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                      <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Quarter Number (1 to 240)</label>
-                      <select
-                        className="quran__form-select"
-                        value={selectedMaqrah}
-                        onChange={(e) => setSelectedMaqrah(e.target.value)}
-                      >
-                        <option value="" disabled>-- Choose Maqrah --</option>
-                        {Array.from({ length: 240 }, (_, i) => i + 1).map((quarter) => (
-                          <option key={quarter} value={quarter}>
-                            Maqrah {quarter} (Quarter)
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                )}
-
-                {activeSelectorMode === 'page' && (
-                  <div>
-                    <h5 style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Choose Page</h5>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                      <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Page Number (1 to 604)</label>
-                      <select
-                        className="quran__form-select"
-                        value={selectedPage}
-                        onChange={(e) => setSelectedPage(e.target.value)}
-                      >
-                        <option value="" disabled>-- Choose Page --</option>
-                        {Array.from({ length: 604 }, (_, i) => i + 1).map((page) => (
-                          <option key={page} value={page}>
-                            Page {page}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Action Button */}
-              <div>
-                <Button
-                  variant="emerald"
-                  fullWidth
-                  icon={BookOpen}
-                  disabled={
-                    activeSelectorMode === 'surah' ? !selectedSurah
-                    : activeSelectorMode === 'juz' ? !selectedJuz
-                    : activeSelectorMode === 'hizb' ? !selectedHizb
-                    : activeSelectorMode === 'hizbQuarter' ? !selectedMaqrah
-                    : !selectedPage
-                  }
-                  onClick={() => {
-                    if (activeSelectorMode === 'surah') {
-                      navigate(`/quran/reader/${selectedSurah}?startAyah=${selectedAyah}&endAyah=${selectedEndAyah}`);
-                    } else if (activeSelectorMode === 'juz') {
-                      navigate(`/quran/reader?type=juz&id=${selectedJuz}`);
-                    } else if (activeSelectorMode === 'hizb') {
-                      navigate(`/quran/reader?type=hizb&id=${selectedHizb}`);
-                    } else if (activeSelectorMode === 'hizbQuarter') {
-                      navigate(`/quran/reader?type=hizbQuarter&id=${selectedMaqrah}`);
-                    } else {
-                      navigate(`/quran/reader?type=page&id=${selectedPage}`);
-                    }
-                  }}
-                >
-                  Start Selected Reading
-                </Button>
-              </div>
-
-            </div>
-          </GlassCard>
-        </div>
-      ) : (
-        /* Surah Search List (shown when search is active) */
-        <div className="quran__surah-list">
-          {filteredSurahs.map((surah, i) => (
             <motion.button
-              key={surah.number}
-              className="quran__surah-row"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 + i * 0.02 }}
-              onClick={() => navigate(`/quran/reader/${surah.number}`)}
-              whileHover={{ x: 4 }}
+              type="button"
+              disabled={!isReadyToStart}
+              onClick={handleStart}
+              whileTap={{ scale: 0.97 }}
+              style={{
+                width: '100%', marginTop: '0.85rem', padding: '0.8rem', borderRadius: '14px', border: 'none',
+                background: isReadyToStart ? 'linear-gradient(90deg,#10b981,#f59e0b)' : 'rgba(255,255,255,0.05)',
+                color: isReadyToStart ? 'white' : 'var(--text-muted)',
+                fontWeight: 800, fontSize: '0.88rem',
+                cursor: isReadyToStart ? 'pointer' : 'not-allowed',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                boxShadow: isReadyToStart ? '0 4px 20px rgba(16,185,129,0.3)' : 'none',
+                transition: 'all 0.25s ease', fontFamily: 'var(--font-sans)',
+              }}
             >
-              <div className="quran__surah-num">{surah.number}</div>
-              <div className="quran__surah-info">
-                <div className="quran__surah-names">
-                  <span className="quran__surah-en">{surah.name}</span>
-                  <span className="quran__surah-badge">{surah.type}</span>
-                </div>
-                <span className="quran__surah-ar">{surah.arabic}</span>
-              </div>
-              <div className="quran__surah-right">
-                <span className="quran__surah-ayahs">{surah.ayahs} ayahs</span>
-                <ArrowRight size={14} style={{ color: 'var(--text-muted)' }} />
-              </div>
+              <BookOpen size={15} />
+              {isReadyToStart ? 'Start Reading ›' : 'Select an option above'}
             </motion.button>
-          ))}
-        </div>
-      )}
+          </GlassCard>
 
-      {/* Bookmarks Section (shown when search is empty) */}
-      {!search && quranBookmarks && quranBookmarks.length > 0 && (
-        <div style={{ marginTop: '1.5rem' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '0.75rem' }}>Your Bookmarks</h3>
+          {/* ── Bookmarks ─────────────────────────────── */}
+          {quranBookmarks && quranBookmarks.length > 0 && (
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h3 className="quran__section-title"><span>⭐</span> Bookmarks</h3>
+              <div className="quran__surah-list">
+                {quranBookmarks.map(bm => (
+                  <button key={bm.id} className="quran__surah-row" onClick={() => navigate(`/quran/reader/${bm.surah}`)}>
+                    <div className="quran__surah-num" style={{ background: 'rgba(245,158,11,0.12)', borderColor: 'rgba(245,158,11,0.25)', color: 'var(--color-gold)' }}>★</div>
+                    <div className="quran__surah-info">
+                      <div className="quran__surah-names"><span className="quran__surah-en">{SURAH_NAMES[bm.surah - 1] || `Surah ${bm.surah}`}</span></div>
+                      <span className="quran__surah-ar">{SURAH_ARABIC_NAMES[bm.surah - 1]}</span>
+                    </div>
+                    <div className="quran__surah-right">
+                      <span className="quran__surah-ayahs">Ayah {bm.ayah}</span>
+                      <ArrowRight size={13} style={{ color: 'var(--text-muted)' }} />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── All Surahs ────────────────────────────── */}
+          <h3 className="quran__section-title"><span>📚</span> All Surahs</h3>
           <div className="quran__surah-list">
-            {quranBookmarks.map((bm) => {
-              const surahIdx = bm.surah - 1;
-              const surahName = SURAH_NAMES[surahIdx] || `Surah ${bm.surah}`;
-              const surahArabic = SURAH_ARABIC_NAMES[surahIdx] || '';
+            {SURAH_NAMES.map((name, i) => {
+              const meta = ALL_SURAH_META[i];
               return (
-                <button
-                  key={bm.id}
-                  className="quran__surah-row"
-                  onClick={() => navigate(`/quran/reader/${bm.surah}`)}
-                  style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '1rem', background: 'var(--glass-bg)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--glass-border)', textAlign: 'left', cursor: 'pointer' }}
+                <motion.button
+                  key={i + 1} className="quran__surah-row"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true, margin: '-30px' }}
+                  transition={{ duration: 0.22 }}
+                  onClick={() => navigate(`/quran/reader/${i + 1}`)}
                 >
-                  <div className="quran__surah-num" style={{ color: 'var(--color-gold)' }}>★</div>
-                  <div className="quran__surah-info" style={{ flex: 1 }}>
-                    <span className="quran__surah-en" style={{ fontWeight: 700 }}>{surahName}</span>
-                    <span className="quran__surah-ar" style={{ float: 'right', fontFamily: 'var(--font-arabic)', fontSize: '0.9rem' }}>{surahArabic}</span>
+                  <div className="quran__surah-num">{i + 1}</div>
+                  <div className="quran__surah-info">
+                    <div className="quran__surah-names">
+                      <span className="quran__surah-en">{name}</span>
+                      <span className="quran__surah-badge">{meta?.type}</span>
+                    </div>
+                    <span className="quran__surah-ar">{SURAH_ARABIC_NAMES[i]}</span>
                   </div>
-                  <div className="quran__surah-right" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Ayah {bm.ayah}</span>
-                    <ArrowRight size={14} style={{ color: 'var(--text-muted)' }} />
+                  <div className="quran__surah-right">
+                    <span className="quran__surah-ayahs">{meta?.ayahs} ayahs</span>
+                    <ArrowRight size={13} style={{ color: 'var(--text-muted)' }} />
                   </div>
-                </button>
+                </motion.button>
               );
             })}
           </div>
-        </div>
+        </motion.div>
       )}
 
-      {/* Goal Edit Modal Overlay */}
+      {/* ── Goal Modal ────────────────────────────────── */}
       <AnimatePresence>
         {showGoalModal && (
           <div className="quran__modal-overlay">
-            <motion.div 
-              className="quran__modal"
-              initial={{ scale: 0.92, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.92, opacity: 0 }}
-            >
+            <motion.div className="quran__modal" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}>
               <div className="quran__modal-header">
-                <h3>Set Daily Reading Goal</h3>
-                <button className="quran__modal-close" onClick={() => setShowGoalModal(false)}>
-                  <X size={18} />
-                </button>
+                <h3>Daily Reading Goal</h3>
+                <button className="quran__modal-close" onClick={() => setShowGoalModal(false)}><X size={18} /></button>
               </div>
-
               <form onSubmit={handleSaveGoal} className="quran__modal-form">
                 <div className="quran__form-group">
                   <label className="quran__form-label">Goal Metric</label>
-                  <select 
-                    value={tempGoalType} 
-                    onChange={(e) => {
-                      setTempGoalType(e.target.value);
-                      setTempGoalValue(1);
-                    }}
-                    className="quran__form-select"
-                  >
+                  <select value={tempGoalType} onChange={e => { setTempGoalType(e.target.value); setTempGoalValue(1); }} className="quran__form-select">
                     <option value="ayah">Ayahs</option>
                     <option value="page">Pages</option>
                     <option value="maqrah">Maqrahs (Rub el Hizb)</option>
@@ -782,29 +666,17 @@ export default function Quran() {
                     <option value="juz">Juzs</option>
                   </select>
                 </div>
-
                 <div className="quran__form-group">
-                  <label className="quran__form-label">Target repetitions / count</label>
+                  <label className="quran__form-label">Daily Target</label>
                   <div className="quran__stepper">
-                    <button type="button" onClick={() => setTempGoalValue(v => Math.max(1, v - 1))} className="quran__step-btn">
-                      <Minus size={14} />
-                    </button>
+                    <button type="button" onClick={() => setTempGoalValue(v => Math.max(1, v - 1))} className="quran__step-btn"><Minus size={14} /></button>
                     <span className="quran__step-val">{tempGoalValue}</span>
-                    <button type="button" onClick={() => setTempGoalValue(v => Math.min(150, v + 1))} className="quran__step-btn">
-                      <Plus size={14} />
-                    </button>
+                    <button type="button" onClick={() => setTempGoalValue(v => Math.min(150, v + 1))} className="quran__step-btn"><Plus size={14} /></button>
                   </div>
                   <span className="quran__form-info-hint">
-                    Calculated daily work: ~{
-                      tempGoalType === 'juz' ? tempGoalValue * 20 
-                      : tempGoalType === 'hizb' ? tempGoalValue * 10
-                      : tempGoalType === 'maqrah' ? Math.ceil(tempGoalValue * 2.5)
-                      : tempGoalType === 'ayah' ? Math.ceil(tempGoalValue / 15)
-                      : tempGoalValue
-                    } pages.
+                    ~{tempGoalType === 'juz' ? tempGoalValue * 20 : tempGoalType === 'hizb' ? tempGoalValue * 10 : tempGoalType === 'maqrah' ? Math.ceil(tempGoalValue * 2.5) : tempGoalType === 'ayah' ? Math.ceil(tempGoalValue / 15) : tempGoalValue} pages/day
                   </span>
                 </div>
-
                 <div className="quran__modal-actions">
                   <Button variant="ghost" type="button" onClick={() => setShowGoalModal(false)}>Cancel</Button>
                   <Button variant="emerald" type="submit">Save Goal</Button>
@@ -817,3 +689,4 @@ export default function Quran() {
     </div>
   );
 }
+
