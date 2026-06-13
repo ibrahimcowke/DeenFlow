@@ -15,7 +15,15 @@ export const useAppStore = create(
         xp: 0,
         joinDate: new Date().toISOString(),
       },
-      setUser: (user) => set({ user }),
+      setUser: (user) => set({ 
+        user: user ? {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          isDemo: user.isDemo || false
+        } : null 
+      }),
       setUserProfile: (profile) => set((s) => ({ userProfile: { ...s.userProfile, ...profile } })),
 
       // ── Onboarding ────────────────────────────────────────

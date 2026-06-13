@@ -72,8 +72,14 @@ export default function Family() {
     setShowAddChallenge(false);
   };
 
+  // Map members to dynamically replace 'Ibrahim' with the authenticated user's name
+  const displayedMembers = members.map(m => 
+    m.id === 1 ? { ...m, name: `${userProfile.name} (You)` } : m
+  );
+
   // Sort members by deenScore descending for the leaderboard
-  const sortedLeaderboard = [...members].sort((a, b) => b.deenScore - a.deenScore);
+  const sortedLeaderboard = [...displayedMembers].sort((a, b) => b.deenScore - a.deenScore);
+
 
   return (
     <div className="family page-container">
@@ -125,7 +131,7 @@ export default function Family() {
             Family Members
           </h3>
           <div className="family__members-list">
-            {members.map((m, idx) => (
+            {displayedMembers.map((m, idx) => (
               <GlassCard key={m.id} className="family__member-card" padding="md" delay={0.15 + idx * 0.05}>
                 <div className="family__member-layout">
                   <div className="family__member-avatar">{m.avatar}</div>

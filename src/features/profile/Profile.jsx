@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
-import { Award, Calendar, BookOpen, Clock, Heart, Zap, User, Star } from 'lucide-react';
+import { useState } from 'react';
+import { Award, Calendar, BookOpen, Clock, Heart, Zap, User, Star, Edit2 } from 'lucide-react';
 import GlassCard from '../../components/ui/GlassCard';
 import RingProgress from '../../components/ui/RingProgress';
+import Button from '../../components/ui/Button';
 import { useAppStore } from '../../store';
 import './Profile.css';
 
@@ -15,7 +17,16 @@ const BADGES = [
 ];
 
 export default function Profile() {
-  const { userProfile, habits, todaySalah, quranProgress } = useAppStore();
+  const { userProfile, setUserProfile, habits, todaySalah, quranProgress } = useAppStore();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(userProfile.name);
+
+  const handleSaveName = (e) => {
+    e.preventDefault();
+    if (!editName.trim()) return;
+    setUserProfile({ name: editName.trim() });
+    setIsEditing(false);
+  };
 
   const xpNeeded = 1000;
   const currentXP = userProfile.xp || 320;
@@ -49,7 +60,40 @@ export default function Profile() {
           </div>
 
           <div className="profile__user-info">
-            <h2 className="profile__username">{userProfile.name}</h2>
+            {isEditing ? (
+              <form onSubmit={handleSaveName} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <input 
+                  type="text" 
+                  value={editName} 
+                  onChange={e => setEditName(e.target.value)}
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid var(--glass-border)',
+                    color: 'white',
+                    fontSize: '1.25rem',
+                    fontWeight: 700,
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '8px',
+                    width: '180px',
+                    outline: 'none'
+                  }}
+                  autoFocus
+                />
+                <Button variant="emerald" type="submit" style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', height: '34px' }}>Save</Button>
+                <Button variant="ghost" onClick={() => setIsEditing(false)} style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', height: '34px' }}>Cancel</Button>
+              </form>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                <h2 className="profile__username" style={{ margin: 0 }}>{userProfile.name}</h2>
+                <button 
+                  onClick={() => { setEditName(userProfile.name); setIsEditing(true); }}
+                  style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0.25rem' }}
+                  title="Edit Name"
+                >
+                  <Edit2 size={14} />
+                </button>
+              </div>
+            )}
             <div className="profile__joined">
               <Calendar size={14} />
               <span>Joined June 2026</span>

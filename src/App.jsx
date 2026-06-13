@@ -105,6 +105,9 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // Sync user state to store
+        useAppStore.getState().setUser(user);
+
         const dbRef = ref(rtdb, `users/${user.uid}/state`);
         try {
           const snapshot = await get(dbRef);
@@ -112,10 +115,16 @@ export default function App() {
             const remoteState = snapshot.val();
             // Hydrate the local Zustand store with remote data
             useAppStore.setState(remoteState);
+            // Re-apply the active user to override remote state's user pointer
+            useAppStore.getState().setUser(user);
           } else {
             // First time login: sync current local storage state to cloud database
             const localState = useAppStore.getState();
-            const stateToSave = partializeState(localState);
+            const realName = user.displayName || user.email?.split('@')[0] || 'Believer';
+            const updatedProfile = { ...localState.userProfile, name: realName };
+            useAppStore.setState({ userProfile: updatedProfile });
+            
+            const stateToSave = partializeState({ ...localState, userProfile: updatedProfile });
             await rtdbSet(dbRef, stateToSave);
           }
         } catch (err) {
@@ -140,6 +149,9 @@ export default function App() {
           unsubscribeStore();
           if (timeoutId) clearTimeout(timeoutId);
         };
+      } else {
+        // Clear user state in store on logout
+        useAppStore.getState().setUser(null);
       }
     });
 

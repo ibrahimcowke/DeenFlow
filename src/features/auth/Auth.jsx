@@ -84,6 +84,21 @@ export default function Auth() {
     }
   };
 
+  const handleDemoBypass = () => {
+    const store = useAppStore.getState();
+    store.setUser({
+      uid: 'demo-user',
+      email: 'demo@deenflow.com',
+      displayName: 'Guest Believer',
+      isDemo: true
+    });
+    const currentName = store.userProfile.name;
+    if (!currentName || currentName === 'Ibrahim') {
+      store.setUserProfile({ name: 'Guest Believer' });
+    }
+    navigate('/');
+  };
+
   return (
     <div className="auth">
       {/* Dynamic Animated Ambient Orbs */}
@@ -257,7 +272,7 @@ export default function Auth() {
         </button>
 
         {/* Demo Navigation Shortcut */}
-        <button type="button" className="auth__demo-bypass" onClick={() => navigate('/')}>
+        <button type="button" className="auth__demo-bypass" onClick={handleDemoBypass}>
           ⚡ Skip and Enter in Demo Mode
         </button>
       </motion.div>
