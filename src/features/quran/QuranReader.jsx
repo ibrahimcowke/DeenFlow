@@ -609,7 +609,12 @@ export default function QuranReader() {
           </div>
 
           <span className="reader__surah-meta">
-            {surahData ? `Juz ${surahData.juz} · Page ${surahData.page}` : ''}
+            {surahData ? (
+              <>
+                Juz {surahData.juz} · Page {surahData.page}
+                {isAyahRangeMode && ` · Selected: ${surahData.ayahs.length} Ayahs`}
+              </>
+            ) : ''}
           </span>
         </div>
         
@@ -855,7 +860,9 @@ export default function QuranReader() {
                   <span className="reader__modal-stat-label">Scope:</span>
                   <span className="reader__modal-stat-value">
                     {readType === 'surah' 
-                      ? `${surahData.name} (${surahData.ayahs.length} Ayahs)` 
+                      ? (isAyahRangeMode 
+                          ? `${surahData.name} (Selected: ${surahData.ayahs.length} Ayahs)` 
+                          : `${surahData.name} (${surahData.ayahs.length} Ayahs)`)
                       : `${surahData.name}`}
                   </span>
                 </div>

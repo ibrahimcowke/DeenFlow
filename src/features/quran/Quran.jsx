@@ -321,6 +321,23 @@ export default function Quran() {
                         </>
                       )}
                     </div>
+                    {selectedSurah && (
+                      <div style={{ 
+                        marginTop: '1rem', 
+                        padding: '0.65rem 0.85rem', 
+                        background: 'rgba(16, 185, 129, 0.08)', 
+                        border: '1px solid rgba(16, 185, 129, 0.15)', 
+                        borderRadius: '12px', 
+                        fontSize: '0.85rem', 
+                        color: 'var(--color-emerald)', 
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        fontWeight: 600
+                      }}>
+                        <span>📊</span> Selected: {parseInt(selectedEndAyah) - parseInt(selectedAyah) + 1} Ayah{parseInt(selectedEndAyah) - parseInt(selectedAyah) + 1 > 1 ? 's' : ''} to read
+                      </div>
+                    )}
                   </div>
                 )}
 
