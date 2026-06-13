@@ -13,24 +13,42 @@ import Onboarding from './features/onboarding/Onboarding';
 import Auth from './features/auth/Auth';
 import Dashboard from './features/dashboard/Dashboard';
 
+// Helper to handle dynamic import failures (chunk load errors after a new deployment)
+const lazyWithRetry = (componentImport) =>
+  lazy(async () => {
+    const hasReloaded = sessionStorage.getItem('chunk-reload-attempted');
+    try {
+      const result = await componentImport();
+      sessionStorage.removeItem('chunk-reload-attempted');
+      return result;
+    } catch (error) {
+      if (!hasReloaded) {
+        sessionStorage.setItem('chunk-reload-attempted', 'true');
+        window.location.reload();
+        return;
+      }
+      throw error;
+    }
+  });
+
 // Lazy-loadable screens
-const Salah     = lazy(() => import('./features/salah/Salah'));
-const Quran     = lazy(() => import('./features/quran/Quran'));
-const QuranReader = lazy(() => import('./features/quran/QuranReader'));
-const Azkar     = lazy(() => import('./features/azkar/Azkar'));
-const Habits    = lazy(() => import('./features/habits/Habits'));
-const Fasting   = lazy(() => import('./features/fasting/Fasting'));
-const Recovery  = lazy(() => import('./features/recovery/Recovery'));
-const Emergency = lazy(() => import('./features/recovery/Emergency'));
-const Notes     = lazy(() => import('./features/notes/Notes'));
-const AICoach   = lazy(() => import('./features/aiCoach/AICoach'));
-const Dua       = lazy(() => import('./features/azkar/Azkar'));
-const Hadith    = lazy(() => import('./features/hadith/Hadith'));
-const Charity   = lazy(() => import('./features/charity/Charity'));
-const Family    = lazy(() => import('./features/family/Family'));
-const Qibla     = lazy(() => import('./features/qibla/Qibla'));
-const Profile   = lazy(() => import('./features/profile/Profile'));
-const Settings  = lazy(() => import('./features/settings/Settings'));
+const Salah     = lazyWithRetry(() => import('./features/salah/Salah'));
+const Quran     = lazyWithRetry(() => import('./features/quran/Quran'));
+const QuranReader = lazyWithRetry(() => import('./features/quran/QuranReader'));
+const Azkar     = lazyWithRetry(() => import('./features/azkar/Azkar'));
+const Habits    = lazyWithRetry(() => import('./features/habits/Habits'));
+const Fasting   = lazyWithRetry(() => import('./features/fasting/Fasting'));
+const Recovery  = lazyWithRetry(() => import('./features/recovery/Recovery'));
+const Emergency = lazyWithRetry(() => import('./features/recovery/Emergency'));
+const Notes     = lazyWithRetry(() => import('./features/notes/Notes'));
+const AICoach   = lazyWithRetry(() => import('./features/aiCoach/AICoach'));
+const Dua       = lazyWithRetry(() => import('./features/azkar/Azkar'));
+const Hadith    = lazyWithRetry(() => import('./features/hadith/Hadith'));
+const Charity   = lazyWithRetry(() => import('./features/charity/Charity'));
+const Family    = lazyWithRetry(() => import('./features/family/Family'));
+const Qibla     = lazyWithRetry(() => import('./features/qibla/Qibla'));
+const Profile   = lazyWithRetry(() => import('./features/profile/Profile'));
+const Settings  = lazyWithRetry(() => import('./features/settings/Settings'));
 
 function PageLoader() {
   return (
