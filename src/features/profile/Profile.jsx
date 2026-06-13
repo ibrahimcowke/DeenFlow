@@ -39,6 +39,7 @@ export default function Profile() {
   const stats = [
     { label: 'Completed Salah', val: '142', sub: `${completedPrayersToday} today`, icon: '🕌', color: 'var(--color-emerald)' },
     { label: 'Quran Pages', val: `${quranProgress.totalPages || 12}`, sub: `${quranProgress.todayPages || 0} today`, icon: '📖', color: '#6366F1' },
+    { label: 'Hasanat Earned', val: `${userProfile.totalHasanat || 0}`, sub: '10x per letter read', icon: '✨', color: 'var(--color-gold)' },
     { label: 'Habits Completed', val: '88', sub: `${completedHabitsToday} today`, icon: '🔥', color: '#F59E0B' },
     { label: 'Sunnah Fasts', val: '6', sub: 'Active logs', icon: '🌙', color: '#EC4899' },
   ];

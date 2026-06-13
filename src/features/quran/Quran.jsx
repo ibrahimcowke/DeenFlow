@@ -90,7 +90,7 @@ const getSurahForPage = (page) => {
 
 export default function Quran() {
   const navigate = useNavigate();
-  const { quranProgress, goals, setGoals, quranBookmarks } = useAppStore();
+  const { quranProgress, goals, setGoals, quranBookmarks, userProfile } = useAppStore();
   const [activeTab, setActiveTab] = useState('All');
   const [search, setSearch] = useState('');
   
@@ -188,7 +188,7 @@ export default function Quran() {
         {[
           { icon: '📜', label: 'Pages Read', val: quranProgress.totalPages },
           { icon: '🔥', label: 'Day Streak', val: `${quranProgress.streak}d` },
-          { icon: '📚', label: 'Juz Done', val: Math.floor(quranProgress.totalPages / 20) },
+          { icon: '✨', label: 'Hasanat Earned', val: userProfile.totalHasanat || 0 },
           { icon: '⭐', label: 'Bookmarks', val: quranBookmarks.length },
         ].map((s, i) => (
           <GlassCard key={s.label} className="quran__stat-card" delay={0.15 + i * 0.05} padding="sm">

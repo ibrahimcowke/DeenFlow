@@ -287,7 +287,11 @@ export default function QuranReader() {
     }
 
     // Commit to store
-    setUserProfile({ xp: newXp, level: newLevel });
+    setUserProfile({ 
+      xp: newXp, 
+      level: newLevel,
+      totalHasanat: (userProfile.totalHasanat || 0) + totalHasanatGained
+    });
 
     const progress = useAppStore.getState().quranProgress;
     let newStreak = progress.streak || 0;
@@ -375,6 +379,16 @@ export default function QuranReader() {
     }, 100);
     return () => clearTimeout(timer);
   }, [currentAyah, surahData]);
+
+  // Calculate letters read and Hasanat in render scope (1 letter = 10 Hasanat)
+  let totalLettersRead = 0;
+  if (surahData?.ayahs) {
+    surahData.ayahs.forEach(ayah => {
+      const letters = (ayah.arabic.match(/[\u0621-\u064A]/g) || []).length;
+      totalLettersRead += letters;
+    });
+  }
+  const totalHasanatGained = totalLettersRead * 10;
 
   if (loading) {
     return (
@@ -748,7 +762,6 @@ export default function QuranReader() {
               <span className="reader__modal-emoji">🏆</span>
               <h2 className="reader__modal-title">Reading Completed!</h2>
               <p className="reader__modal-subtitle">Alhamdulillah, you have finished your selected portion.</p>
-
               <div className="reader__modal-stats">
                 <div className="reader__modal-stat-row">
                   <span className="reader__modal-stat-label">Mode:</span>
@@ -762,6 +775,18 @@ export default function QuranReader() {
                     {readType === 'surah' 
                       ? `${surahData.name} (${surahData.ayahs.length} Ayahs)` 
                       : `${surahData.name}`}
+                  </span>
+                </div>
+                <div className="reader__modal-stat-row">
+                  <span className="reader__modal-stat-label">Letters Read:</span>
+                  <span className="reader__modal-stat-value" style={{ fontWeight: 700 }}>
+                    {totalLettersRead} Huroof
+                  </span>
+                </div>
+                <div className="reader__modal-stat-row" style={{ color: 'var(--color-gold)' }}>
+                  <span className="reader__modal-stat-label" style={{ color: 'var(--color-gold)' }}>Hasanat Gained:</span>
+                  <span className="reader__modal-stat-value" style={{ fontWeight: 800 }}>
+                    ✨ +{totalHasanatGained}
                   </span>
                 </div>
                 <div className="reader__modal-stat-row" style={{ borderTop: '1px solid var(--glass-border)', paddingTop: '0.75rem', marginTop: '0.25rem' }}>
