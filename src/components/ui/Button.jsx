@@ -3,7 +3,7 @@ import './Button.css';
 
 /**
  * Premium Button component
- * variant: 'primary' | 'secondary' | 'ghost' | 'danger' | 'gold' | 'outline'
+ * variant: 'primary' | 'secondary' | 'ghost' | 'danger' | 'gold' | 'outline' | 'emerald'
  * size: 'sm' | 'md' | 'lg' | 'xl'
  */
 export default function Button({

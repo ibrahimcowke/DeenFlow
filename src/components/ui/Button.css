@@ -25,12 +25,14 @@
 .btn--xl  { height: 60px; padding: 0 var(--space-10); font-size: var(--text-lg); border-radius: var(--radius-2xl); }
 
 /* ── Variants ───────────────────────────────────────────── */
-.btn--primary {
+.btn--primary,
+.btn--emerald {
   background: var(--grad-emerald);
   color: #fff;
   box-shadow: 0 4px 20px rgba(16,185,129,0.35), 0 1px 0 rgba(255,255,255,0.12) inset;
 }
-.btn--primary:hover {
+.btn--primary:hover,
+.btn--emerald:hover {
   box-shadow: 0 6px 28px rgba(16,185,129,0.5), 0 1px 0 rgba(255,255,255,0.12) inset;
 }
 
